@@ -34,6 +34,10 @@ const PATH_METHODS = [
  * value for each key is the result of calling `transform` on `obj[key]`.
  */
 function mapValues(obj, transform, thisArg) {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+
   return Object.keys(obj)
     .reduce(
       (newObj, propName) => {
@@ -178,6 +182,10 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Schema Object.
    */
   transformSchema(schema) {
+    if (typeof schema !== 'object' || schema === null) {
+      return schema;
+    }
+
     const newSchema = { ...schema };
 
     if (schema.discriminator !== undefined) {
@@ -230,13 +238,16 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Items Object.
    */
   transformItems(items) {
-    const newItems = { ...items };
-
-    if (items.items !== undefined) {
-      newItems.items = this.transformItems(items.items);
+    if (typeof items !== 'object'
+      || items === null
+      || items.items === undefined) {
+      return items;
     }
 
-    return newItems;
+    return {
+      ...items,
+      items: this.transformItems(items.items),
+    };
   }
 
 
@@ -278,7 +289,9 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Header Object.
    */
   transformHeader(header) {
-    if (!header.schema) {
+    if (typeof header !== 'object'
+      || header === null
+      || header.schema === undefined) {
       return header;
     }
 
@@ -312,7 +325,9 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Encoding Object.
    */
   transformEncoding(encoding) {
-    if (!encoding.headers) {
+    if (typeof encoding !== 'object'
+      || encoding === null
+      || encoding.headers === undefined) {
       return encoding;
     }
 
@@ -346,13 +361,16 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Link Object.
    */
   transformLink(link) {
-    const newLink = { ...link };
-
-    if (link.server) {
-      newLink.server = this.transformServer(link.server);
+    if (typeof link !== 'object'
+      || link === null
+      || link.server === undefined) {
+      return link;
     }
 
-    return newLink;
+    return {
+      ...link,
+      server: this.transformServer(link.server),
+    };
   }
 
 
@@ -378,6 +396,10 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Media Type Object.
    */
   transformMediaType(mediaType) {
+    if (typeof mediaType !== 'object' || mediaType === null) {
+      return mediaType;
+    }
+
     const newMediaTypeObj = { ...mediaType };
 
     if (mediaType.schema !== undefined) {
@@ -417,6 +439,10 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Response Object.
    */
   transformResponse(response) {
+    if (typeof response !== 'object' || response === null) {
+      return response;
+    }
+
     const newResponse = { ...response };
 
     if (response.headers !== undefined) {
@@ -470,6 +496,10 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Parameter Object.
    */
   transformParameter(parameter) {
+    if (typeof parameter !== 'object' || parameter === null) {
+      return parameter;
+    }
+
     const newParameter = { ...parameter };
 
     if (parameter.content !== undefined) {
@@ -556,7 +586,9 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Request Body Object.
    */
   transformRequestBody(requestBody) {
-    if (!requestBody.content) {
+    if (typeof requestBody !== 'object'
+      || requestBody === null
+      || requestBody.content === undefined) {
       return requestBody;
     }
 
@@ -590,6 +622,10 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Operation Object.
    */
   transformOperation(operation) {
+    if (typeof operation !== 'object' || operation === null) {
+      return operation;
+    }
+
     const newOperation = { ...operation };
 
     if (operation.externalDocs !== undefined) {
@@ -627,7 +663,12 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Path Item Object.
    */
   transformPathItem(pathItem) {
+    if (typeof pathItem !== 'object' || pathItem === null) {
+      return pathItem;
+    }
+
     const newPathItem = { ...pathItem };
+
     if (pathItem.parameters !== undefined) {
       newPathItem.parameters =
         this.transformParameterArray(pathItem.parameters);
@@ -663,6 +704,10 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Components Object.
    */
   transformComponents(components) {
+    if (typeof components !== 'object' || components === null) {
+      return components;
+    }
+
     const newComponents = { ...components };
 
     if (components.schemas !== undefined) {
@@ -745,13 +790,16 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Server Object.
    */
   transformServer(server) {
-    const newServer = { ...server };
-
-    if (server.variables !== undefined) {
-      newServer.variables = this.transformServerVariableMap(server.variables);
+    if (typeof server !== 'object'
+      || server === null
+      || server.variables === undefined) {
+      return server;
     }
 
-    return newServer;
+    return {
+      ...server,
+      variables: this.transformServerVariableMap(server.variables),
+    };
   }
 
 
@@ -765,7 +813,7 @@ class OpenApiTransformerBase {
    * @return {!Object<string,!Object>} Transformed Array of Server Object.
    */
   transformServers(servers) {
-    return servers.map(this.transformServer, this);
+    return mapValues(servers, this.transformServer, this);
   }
 
 
@@ -790,6 +838,10 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed OAuth Flows Object.
    */
   transformOAuthFlows(flows) {
+    if (typeof flows !== 'object' || flows === null) {
+      return flows;
+    }
+
     const newFlows = { ...flows };
 
     if (flows.implicit) {
@@ -822,14 +874,16 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Security Scheme Object.
    */
   transformSecurityScheme(securityScheme) {
-    const newSecurityScheme = { ...securityScheme };
-
-    if (securityScheme.flows !== undefined) {
-      newSecurityScheme.flows =
-        this.transformOAuthFlows(securityScheme.flows);
+    if (typeof securityScheme !== 'object'
+      || securityScheme === null
+      || securityScheme.flows === undefined) {
+      return securityScheme;
     }
 
-    return newSecurityScheme;
+    return {
+      ...securityScheme,
+      flows: this.transformOAuthFlows(securityScheme.flows),
+    };
   }
 
 
@@ -845,7 +899,7 @@ class OpenApiTransformerBase {
    * Scheme Object.
    */
   transformSecuritySchemes(securitySchemes) {
-    return securitySchemes.map(this.transformSecurityScheme, this);
+    return mapValues(securitySchemes, this.transformSecurityScheme, this);
   }
 
 
@@ -874,7 +928,11 @@ class OpenApiTransformerBase {
    * Requirement Object.
    */
   transformSecurityRequirements(securityRequirements) {
-    return securityRequirements.map(this.transformSecurityRequirement, this);
+    return mapValues(
+      securityRequirements,
+      this.transformSecurityRequirement,
+      this,
+    );
   }
 
 
@@ -886,13 +944,16 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Tag Object.
    */
   transformTag(tag) {
-    const newTag = { ...tag };
-
-    if (tag.externalDocs !== undefined) {
-      newTag.externalDocs = this.transformExternalDocs(tag.externalDocs);
+    if (typeof tag !== 'object'
+      || tag === null
+      || tag.externalDocs === undefined) {
+      return tag;
     }
 
-    return newTag;
+    return {
+      ...tag,
+      externalDocs: this.transformExternalDocs(tag.externalDocs),
+    };
   }
 
 
@@ -906,7 +967,7 @@ class OpenApiTransformerBase {
    * @return {!Object<string,!Object>} Transformed Array of Tag Object.
    */
   transformTags(tags) {
-    return tags.map(this.transformTag, this);
+    return mapValues(tags, this.transformTag, this);
   }
 
 
@@ -944,6 +1005,10 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed Info Object.
    */
   transformInfo(info) {
+    if (typeof info !== 'object' || info === null) {
+      return info;
+    }
+
     const newInfo = { ...info };
 
     if (info.contact !== undefined) {
@@ -968,6 +1033,10 @@ class OpenApiTransformerBase {
    * @return {!Object} Transformed OpenAPI Object.
    */
   transformOpenApi(openApi) {
+    if (typeof openApi !== 'object' || openApi === null) {
+      return openApi;
+    }
+
     const newOpenApi = {
       ...openApi,
     };
