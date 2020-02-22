@@ -206,8 +206,8 @@ class OpenApiTransformerBase {
 
     ['allOf', 'anyOf', 'oneOf'].forEach((schemaProp) => {
       const subSchemas = schema[schemaProp];
-      if (Array.isArray(subSchemas)) {
-        newSchema[schemaProp] = subSchemas.map(this.transformSchema, this);
+      if (subSchemas !== undefined) {
+        newSchema[schemaProp] = this.transformSchemaArray(subSchemas);
       }
     });
 
@@ -237,6 +237,20 @@ class OpenApiTransformerBase {
     }
 
     return newItems;
+  }
+
+
+  /** Transforms an Array of {@link
+   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#schemaObject
+   * Schema Object}.
+   *
+   * This occurs for schema.allOf, schema.anyOf, schema.oneOf.
+   *
+   * @param {!Array<!Object>} schemas Array of Schema Object.
+   * @return {!Array<!Object>} Transformed Array of Schema Objects.
+   */
+  transformSchemaArray(schemas) {
+    return mapValues(schemas, this.transformSchema, this);
   }
 
 
@@ -478,6 +492,20 @@ class OpenApiTransformerBase {
   }
 
 
+  /** Transforms an Array of {@link
+   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#parameterObject
+   * Parameter Object}.
+   *
+   * This occurs for operation.parameters and pathItem.parameters.
+   *
+   * @param {!Array<!Object>} parameters Array of Parameter Object.
+   * @return {!Array<!Object>} Transformed Array of Parameter Object.
+   */
+  transformParameterArray(parameters) {
+    return mapValues(parameters, this.transformParameter, this);
+  }
+
+
   /** Transforms a Map from string to {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#parameterObject
    * Parameter Object}.
@@ -569,9 +597,9 @@ class OpenApiTransformerBase {
         this.transformExternalDocs(operation.externalDocs);
     }
 
-    if (Array.isArray(operation.parameters)) {
+    if (operation.parameters !== undefined) {
       newOperation.parameters =
-        operation.parameters.map(this.transformParameter, this);
+        this.transformParameterArray(operation.parameters);
     }
 
     if (operation.requestBody && operation.requestBody.content) {
@@ -600,9 +628,9 @@ class OpenApiTransformerBase {
    */
   transformPathItem(pathItem) {
     const newPathItem = { ...pathItem };
-    if (Array.isArray(pathItem.parameters)) {
+    if (pathItem.parameters !== undefined) {
       newPathItem.parameters =
-        pathItem.parameters.map(this.transformParameter, this);
+        this.transformParameterArray(pathItem.parameters);
     }
 
     PATH_METHODS.forEach((method) => {
