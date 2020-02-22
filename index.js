@@ -400,18 +400,18 @@ class OpenApiTransformerBase {
       return mediaType;
     }
 
-    const newMediaTypeObj = { ...mediaType };
+    const newMediaType = { ...mediaType };
 
     if (mediaType.schema !== undefined) {
-      newMediaTypeObj.schema = this.transformSchema(mediaType.schema);
+      newMediaType.schema = this.transformSchema(mediaType.schema);
     }
 
     if (mediaType.encoding !== undefined) {
-      newMediaTypeObj.encoding =
+      newMediaType.encoding =
         this.transformEncodingMap(mediaType.encoding);
     }
 
-    return newMediaTypeObj;
+    return newMediaType;
   }
 
 
