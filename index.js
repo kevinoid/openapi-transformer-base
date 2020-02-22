@@ -132,7 +132,7 @@ class OpenApiTransformerBase {
    * Example Object.
    * @return {!Object<string,!Object>} Transformed Map of Example Objects.
    */
-  transformExamples3(examples) {
+  transformExample3Map(examples) {
     return mapValues(examples, this.transformExample3, this);
   }
 
@@ -198,7 +198,7 @@ class OpenApiTransformerBase {
     });
 
     if (schema.properties !== undefined) {
-      newSchema.properties = this.transformSchemas(schema.properties);
+      newSchema.properties = this.transformSchemaMap(schema.properties);
     }
 
     ['allOf', 'anyOf', 'oneOf'].forEach((schemaProp) => {
@@ -244,10 +244,11 @@ class OpenApiTransformerBase {
    * This occurs for components.schemas, definitions, and properties of a
    * schema.
    *
-   * @param {!Object<string,!Object>} schemas Map from string to Schema Object.
+   * @param {!Object<string,!Object>} schemas Map from string to Schema
+   * Object.
    * @return {!Object<string,!Object>} Transformed Map of Schema Objects.
    */
-  transformSchemas(schemas) {
+  transformSchemaMap(schemas) {
     return mapValues(schemas, this.transformSchema, this);
   }
 
@@ -281,7 +282,7 @@ class OpenApiTransformerBase {
    * @param {!Object<string,!Object>} headers Map from string to Header Object.
    * @return {!Object<string,!Object>} Transformed Map of Header Objects.
    */
-  transformHeaders(headers) {
+  transformHeaderMap(headers) {
     return mapValues(headers, this.transformHeader, this);
   }
 
@@ -300,7 +301,7 @@ class OpenApiTransformerBase {
 
     return {
       ...encoding,
-      headers: this.transformHeaders(encoding.headers),
+      headers: this.transformHeaderMap(encoding.headers),
     };
   }
 
@@ -315,7 +316,7 @@ class OpenApiTransformerBase {
    * Object.
    * @return {!Object<string,!Object>} Transformed Map of Encoding Objects.
    */
-  transformEncodings(encodings) {
+  transformEncodingMap(encodings) {
     return mapValues(encodings, this.transformEncoding, this);
   }
 
@@ -347,7 +348,7 @@ class OpenApiTransformerBase {
    * @param {!Object<string,!Object>} links Map from string to Link Object.
    * @return {!Object<string,!Object>} Transformed Map of Link Objects.
    */
-  transformLinks(links) {
+  transformLinkMap(links) {
     return mapValues(links, this.transformLink, this);
   }
 
@@ -368,7 +369,7 @@ class OpenApiTransformerBase {
 
     if (mediaType.encoding !== undefined) {
       newMediaTypeObj.encoding =
-        this.transformEncodings(mediaType.encoding);
+        this.transformEncodingMap(mediaType.encoding);
     }
 
     return newMediaTypeObj;
@@ -386,7 +387,7 @@ class OpenApiTransformerBase {
    * Object.
    * @return {!Object<string,!Object>} Transformed Map of Media Type Object.
    */
-  transformMediaTypes(mediaTypes) {
+  transformMediaTypeMap(mediaTypes) {
     return mapValues(mediaTypes, this.transformMediaType, this);
   }
 
@@ -402,15 +403,15 @@ class OpenApiTransformerBase {
     const newResponse = { ...response };
 
     if (response.headers !== undefined) {
-      newResponse.headers = this.transformHeaders(response.headers);
+      newResponse.headers = this.transformHeaderMap(response.headers);
     }
 
     if (response.content !== undefined) {
-      newResponse.content = this.transformMediaTypes(response.content);
+      newResponse.content = this.transformMediaTypeMap(response.content);
     }
 
     if (response.links !== undefined) {
-      newResponse.links = this.transformLinks(response.links);
+      newResponse.links = this.transformLinkMap(response.links);
     }
 
     if (response.schema !== undefined) {
@@ -436,7 +437,7 @@ class OpenApiTransformerBase {
    * Object.
    * @return {!Object<string,!Object>} Transformed Map of Response Object.
    */
-  transformResponses(responses) {
+  transformResponseMap(responses) {
     return mapValues(responses, this.transformResponse, this);
   }
 
@@ -455,7 +456,7 @@ class OpenApiTransformerBase {
     const newParameter = { ...parameter };
 
     if (parameter.content !== undefined) {
-      newParameter.content = this.transformMediaTypes(parameter.content);
+      newParameter.content = this.transformMediaTypeMap(parameter.content);
     }
 
     if (parameter.schema !== undefined) {
@@ -467,7 +468,7 @@ class OpenApiTransformerBase {
     }
 
     if (parameter.examples !== undefined) {
-      newParameter.examples = this.transformExamples3(parameter.examples);
+      newParameter.examples = this.transformExample3Map(parameter.examples);
     }
 
     return newParameter;
@@ -484,7 +485,7 @@ class OpenApiTransformerBase {
    * Object.
    * @return {!Object<string,!Object>} Transformed Map of Parameter Object.
    */
-  transformParameters(parameters) {
+  transformParameterMap(parameters) {
     return mapValues(parameters, this.transformParameter, this);
   }
 
@@ -511,7 +512,7 @@ class OpenApiTransformerBase {
    * Object.
    * @return {!Object<string,!Object>} Transformed Map of Callback Object.
    */
-  transformCallbacks(callbacks) {
+  transformCallbackMap(callbacks) {
     return mapValues(callbacks, this.transformCallback, this);
   }
 
@@ -530,7 +531,7 @@ class OpenApiTransformerBase {
 
     return {
       ...requestBody,
-      content: this.transformMediaTypes(requestBody.content),
+      content: this.transformMediaTypeMap(requestBody.content),
     };
   }
 
@@ -545,7 +546,7 @@ class OpenApiTransformerBase {
    * Body Object.
    * @return {!Object<string,!Object>} Transformed Map of Request Body Object.
    */
-  transformRequestBodies(requestBodies) {
+  transformRequestBodyMap(requestBodies) {
     return mapValues(requestBodies, this.transformRequestBody, this);
   }
 
@@ -576,11 +577,11 @@ class OpenApiTransformerBase {
     }
 
     if (operation.responses !== undefined) {
-      newOperation.responses = this.transformResponses(operation.responses);
+      newOperation.responses = this.transformResponseMap(operation.responses);
     }
 
     if (operation.callbacks !== undefined) {
-      newOperation.callbacks = this.transformCallbacks(operation.callbacks);
+      newOperation.callbacks = this.transformCallbackMap(operation.callbacks);
     }
 
     return newOperation;
@@ -634,42 +635,42 @@ class OpenApiTransformerBase {
     const newComponents = { ...components };
 
     if (components.schemas !== undefined) {
-      newComponents.schemas = this.transformSchemas(components.schemas);
+      newComponents.schemas = this.transformSchemaMap(components.schemas);
     }
 
     if (components.responses !== undefined) {
-      newComponents.responses = this.transformResponses(components.responses);
+      newComponents.responses = this.transformResponseMap(components.responses);
     }
 
     if (components.parameters !== undefined) {
       newComponents.parameters =
-        this.transformParameters(components.parameters);
+        this.transformParameterMap(components.parameters);
     }
 
     if (components.examples !== undefined) {
-      newComponents.examples = this.transformExamples3(components.examples);
+      newComponents.examples = this.transformExample3Map(components.examples);
     }
 
     if (components.requestBodies !== undefined) {
       newComponents.requestBodies =
-        this.transformRequestBodies(components.requestBodies);
+        this.transformRequestBodyMap(components.requestBodies);
     }
 
     if (components.headers !== undefined) {
-      newComponents.headers = this.transformHeaders(components.headers);
+      newComponents.headers = this.transformHeaderMap(components.headers);
     }
 
     if (components.securitySchemes !== undefined) {
       newComponents.securitySchemes =
-        this.transformSecuritySchemes(components.securitySchemes);
+        this.transformSecuritySchemeMap(components.securitySchemes);
     }
 
     if (components.links !== undefined) {
-      newComponents.links = this.transformLinks(components.links);
+      newComponents.links = this.transformLinkMap(components.links);
     }
 
     if (components.callbacks !== undefined) {
-      newComponents.callbacks = this.transformCallbacks(components.callbacks);
+      newComponents.callbacks = this.transformCallbackMap(components.callbacks);
     }
 
     return newComponents;
@@ -700,7 +701,7 @@ class OpenApiTransformerBase {
    * @return {!Object<string,!Object>} Transformed Map of Server Variable
    * Object.
    */
-  transformServerVariables(serverVariables) {
+  transformServerVariableMap(serverVariables) {
     return mapValues(serverVariables, this.transformServerVariable, this);
   }
 
@@ -716,7 +717,7 @@ class OpenApiTransformerBase {
     const newServer = { ...server };
 
     if (server.variables !== undefined) {
-      newServer.variables = this.transformServerVariables(server.variables);
+      newServer.variables = this.transformServerVariableMap(server.variables);
     }
 
     return newServer;
@@ -953,15 +954,15 @@ class OpenApiTransformerBase {
     }
 
     if (openApi.definitions !== undefined) {
-      newOpenApi.definitions = this.transformSchemas(openApi.definitions);
+      newOpenApi.definitions = this.transformSchemaMap(openApi.definitions);
     }
 
     if (openApi.parameters !== undefined) {
-      newOpenApi.parameters = this.transformParameters(openApi.parameters);
+      newOpenApi.parameters = this.transformParameterMap(openApi.parameters);
     }
 
     if (openApi.responses !== undefined) {
-      newOpenApi.responses = this.transformResponses(openApi.responses);
+      newOpenApi.responses = this.transformResponseMap(openApi.responses);
     }
 
     if (openApi.paths !== undefined) {
@@ -970,11 +971,11 @@ class OpenApiTransformerBase {
 
     if (openApi.security !== undefined) {
       newOpenApi.security =
-        this.transformSecurityRequirements(openApi.security);
+        this.transformSecurityRequirementMap(openApi.security);
     }
 
     if (openApi.tags !== undefined) {
-      newOpenApi.tags = this.transformTags(openApi.tags);
+      newOpenApi.tags = this.transformTagMap(openApi.tags);
     }
 
     if (openApi.externalDocs !== undefined) {
