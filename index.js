@@ -35,10 +35,13 @@ const PATH_METHODS = [
  */
 function mapValues(obj, transform, thisArg) {
   return Object.keys(obj)
-    .reduce((newObj, propName) => {
-      newObj[propName] = transform.call(thisArg, obj[propName]);
-      return newObj;
-    }, Object.create(Object.getPrototypeOf(obj)));
+    .reduce(
+      (newObj, propName) => {
+        newObj[propName] = transform.call(thisArg, obj[propName]);
+        return newObj;
+      },
+      Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj)),
+    );
 }
 
 
