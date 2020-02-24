@@ -483,6 +483,22 @@ class OpenApiTransformerBase {
         mapValues(operation.callbacks, this.transformCallback, this);
     }
 
+    if (operation.security !== undefined) {
+      newOperation.security = mapValues(
+        operation.security,
+        this.transformSecurityRequirement,
+        this,
+      );
+    }
+
+    if (operation.servers !== undefined) {
+      newOperation.servers = mapValues(
+        operation.servers,
+        this.transformServer,
+        this,
+      );
+    }
+
     return newOperation;
   }
 
