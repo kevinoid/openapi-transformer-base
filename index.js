@@ -212,6 +212,20 @@ class OpenApiTransformerBase {
         mapValues(schema.properties, this.transformSchema, this);
     }
 
+    if (schema.patternProperties !== undefined) {
+      newSchema.patternProperties =
+        mapValues(schema.patternProperties, this.transformSchema, this);
+    }
+
+    if (schema.unevaluatedProperties !== undefined) {
+      newSchema.unevaluatedProperties =
+        this.transformSchema(schema.unevaluatedProperties);
+    }
+
+    if (schema.propertyNames !== undefined) {
+      newSchema.propertyNames = this.transformSchema(schema.propertyNames);
+    }
+
     // Note: additionalProperties can be boolean or schema (before OpenAPI 3.1)
     // additionalItems can be boolean or schema in all OpenAPI versions
     ['additionalItems', 'additionalProperties'].forEach((schemaProp) => {
