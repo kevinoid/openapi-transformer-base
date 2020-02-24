@@ -232,6 +232,10 @@ class OpenApiTransformerBase {
         mapValues(schema.dependentSchemas, this.transformSchema, this);
     }
 
+    if (schema.contains !== undefined) {
+      newSchema.contains = this.transformSchema(schema.contains);
+    }
+
     ['allOf', 'anyOf', 'oneOf'].forEach((schemaProp) => {
       const subSchemas = schema[schemaProp];
       if (subSchemas !== undefined) {
