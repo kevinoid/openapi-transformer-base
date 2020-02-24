@@ -24,13 +24,20 @@ const PATH_METHODS = [
 /** Creates a copy of an object with values from a transform function.
  *
  * i.e. Array.prototype.map for objects.
- * Like _.mapValues from lodash.
+ * Like _.mapValues from lodash
+ * Like https://github.com/sindresorhus/modify-values
+ *
+ * Unlike the above:
+ * - If the first argument is not an object, it is returned unchanged.
+ * - If the first argument is an Array, a native Array is returned.
+ * - The returned object will have the same prototype as the first argument.
  *
  * @private
- * @param {!Object} obj Object for which to map values.
+ * @template T
+ * @param {T} obj Object for which to map values.
  * @param {function(*): *} transform Function which maps input to output values.
  * @param {*} thisArg Value passed to `transform` as `this`.
- * @return {!Object} Object with same prototype and keys as `obj`, where the
+ * @return {T} Object with same prototype and keys as `obj`, where the
  * value for each key is the result of calling `transform` on `obj[key]`.
  */
 function mapValues(obj, transform, thisArg) {
