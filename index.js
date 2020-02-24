@@ -197,7 +197,18 @@ class OpenApiTransformerBase {
         this.transformSchema(additionalProperties);
     }
 
-    ['items', 'not'].forEach((schemaProp) => {
+    // Note: OpenAPI 3.0 disallows Arrays, 2.0 and 3.1 drafts allow it
+    const { items } = schema;
+    if (items !== undefined) {
+      if (Array.isArray(items)) {
+        newSchema.items =
+          mapValues(items, this.transformSchema, this);
+      } else {
+        newSchema.items = this.transformSchema(items);
+      }
+    }
+
+    ['not'].forEach((schemaProp) => {
       const subSchema = schema[schemaProp];
       if (subSchema !== undefined) {
         newSchema[schemaProp] = this.transformSchema(subSchema);
