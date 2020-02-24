@@ -222,6 +222,11 @@ class OpenApiTransformerBase {
       }
     });
 
+    if (schema.unevaluatedItems !== undefined) {
+      newSchema.unevaluatedItems =
+        this.transformSchema(schema.unevaluatedItems);
+    }
+
     if (schema.dependentSchemas !== undefined) {
       newSchema.dependentSchemas =
         mapValues(schema.dependentSchemas, this.transformSchema, this);
