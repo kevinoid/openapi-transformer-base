@@ -189,9 +189,17 @@ class OpenApiTransformerBase {
       newSchema.xml = this.transformXml(schema.xml);
     }
 
-    ['additionalProperties', 'items', 'not'].forEach((schemaProp) => {
+    // Note: additionalProperties can be boolean or schema (before OpenAPI 3.1)
+    const { additionalProperties } = schema;
+    if (additionalProperties !== undefined
+      && typeof additionalProperties !== 'boolean') {
+      newSchema.additionalProperties =
+        this.transformSchema(additionalProperties);
+    }
+
+    ['items', 'not'].forEach((schemaProp) => {
       const subSchema = schema[schemaProp];
-      if (subSchema && typeof subSchema === 'object') {
+      if (subSchema !== undefined) {
         newSchema[schemaProp] = this.transformSchema(subSchema);
       }
     });
