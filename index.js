@@ -132,25 +132,6 @@ class OpenApiTransformerBase {
   }
 
 
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#exampleObject
-   * OpenAPI 3.x Example Object}.
-   *
-   * This occurs for components.examples, parameter.examples, and
-   * mediaType.examples.  Note that it does not occur as schema.examples,
-   * which is an Array of values (not Example Objects), as defined by JSON
-   * Schema.  See
-   * https://github.com/OAI/OpenAPI-Specification/issues/2094
-   *
-   * @param {!Object<string,!Object>} examples Map from string to OpenAPI 3.x
-   * Example Object.
-   * @return {!Object<string,!Object>} Transformed Map of Example Objects.
-   */
-  transformExample3Map(examples) {
-    return mapValues(examples, this.transformExample3, this);
-  }
-
-
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#externalDocumentationObject
    * External Documentation Object}.
@@ -216,13 +197,15 @@ class OpenApiTransformerBase {
     });
 
     if (schema.properties !== undefined) {
-      newSchema.properties = this.transformSchemaMap(schema.properties);
+      newSchema.properties =
+        mapValues(schema.properties, this.transformSchema, this);
     }
 
     ['allOf', 'anyOf', 'oneOf'].forEach((schemaProp) => {
       const subSchemas = schema[schemaProp];
       if (subSchemas !== undefined) {
-        newSchema[schemaProp] = this.transformSchemaArray(subSchemas);
+        newSchema[schemaProp] =
+          mapValues(subSchemas, this.transformSchema, this);
       }
     });
 
@@ -258,36 +241,6 @@ class OpenApiTransformerBase {
   }
 
 
-  /** Transforms an Array of {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#schemaObject
-   * Schema Object}.
-   *
-   * This occurs for schema.allOf, schema.anyOf, schema.oneOf.
-   *
-   * @param {!Array<!Object>} schemas Array of Schema Object.
-   * @return {!Array<!Object>} Transformed Array of Schema Objects.
-   */
-  transformSchemaArray(schemas) {
-    return mapValues(schemas, this.transformSchema, this);
-  }
-
-
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#schemaObject
-   * Schema Object}.
-   *
-   * This occurs for components.schemas, definitions, and properties of a
-   * schema.
-   *
-   * @param {!Object<string,!Object>} schemas Map from string to Schema
-   * Object.
-   * @return {!Object<string,!Object>} Transformed Map of Schema Objects.
-   */
-  transformSchemaMap(schemas) {
-    return mapValues(schemas, this.transformSchema, this);
-  }
-
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#headerObject
    * Header Object}.
@@ -309,21 +262,6 @@ class OpenApiTransformerBase {
   }
 
 
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#headerObject
-   * Header Object}.
-   *
-   * This occurs for components.headers, encoding.headers, and
-   * response.headers.
-   *
-   * @param {!Object<string,!Object>} headers Map from string to Header Object.
-   * @return {!Object<string,!Object>} Transformed Map of Header Objects.
-   */
-  transformHeaderMap(headers) {
-    return mapValues(headers, this.transformHeader, this);
-  }
-
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#encodingObject
    * Encoding Object}.
@@ -340,23 +278,8 @@ class OpenApiTransformerBase {
 
     return {
       ...encoding,
-      headers: this.transformHeaderMap(encoding.headers),
+      headers: mapValues(encoding.headers, this.transformHeader, this),
     };
-  }
-
-
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#encodingObject
-   * Encoding Object}.
-   *
-   * This occurs for mediaType.encoding.
-   *
-   * @param {!Object<string,!Object>} encodings Map from string to Encoding
-   * Object.
-   * @return {!Object<string,!Object>} Transformed Map of Encoding Objects.
-   */
-  transformEncodingMap(encodings) {
-    return mapValues(encodings, this.transformEncoding, this);
   }
 
 
@@ -381,20 +304,6 @@ class OpenApiTransformerBase {
   }
 
 
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#linkObject
-   * Link Object}.
-   *
-   * This occurs for components.links and response.links.
-   *
-   * @param {!Object<string,!Object>} links Map from string to Link Object.
-   * @return {!Object<string,!Object>} Transformed Map of Link Objects.
-   */
-  transformLinkMap(links) {
-    return mapValues(links, this.transformLink, this);
-  }
-
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#mediaTypeObject
    * Media Type Object}.
@@ -415,26 +324,10 @@ class OpenApiTransformerBase {
 
     if (mediaType.encoding !== undefined) {
       newMediaType.encoding =
-        this.transformEncodingMap(mediaType.encoding);
+        mapValues(mediaType.encoding, this.transformEncoding, this);
     }
 
     return newMediaType;
-  }
-
-
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#mediaTypeObject
-   * Media Type Object}.
-   *
-   * This occurs for response.content, parameter.content, and
-   * requestBody.content.
-   *
-   * @param {!Object<string,!Object>} mediaTypes Map from string to Media Type
-   * Object.
-   * @return {!Object<string,!Object>} Transformed Map of Media Type Object.
-   */
-  transformMediaTypeMap(mediaTypes) {
-    return mapValues(mediaTypes, this.transformMediaType, this);
   }
 
 
@@ -453,15 +346,18 @@ class OpenApiTransformerBase {
     const newResponse = { ...response };
 
     if (response.headers !== undefined) {
-      newResponse.headers = this.transformHeaderMap(response.headers);
+      newResponse.headers =
+        mapValues(response.headers, this.transformHeader, this);
     }
 
     if (response.content !== undefined) {
-      newResponse.content = this.transformMediaTypeMap(response.content);
+      newResponse.content =
+        mapValues(response.content, this.transformMediaType, this);
     }
 
     if (response.links !== undefined) {
-      newResponse.links = this.transformLinkMap(response.links);
+      newResponse.links =
+        mapValues(response.links, this.transformLink, this);
     }
 
     if (response.schema !== undefined) {
@@ -473,22 +369,6 @@ class OpenApiTransformerBase {
     }
 
     return newResponse;
-  }
-
-
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#responseObject
-   * Response Object}.
-   *
-   * This occurs for operation.responses, components.responses, and
-   * openApi.responses.
-   *
-   * @param {!Object<string,!Object>} mediaTypes Map from string to Response
-   * Object.
-   * @return {!Object<string,!Object>} Transformed Map of Response Object.
-   */
-  transformResponseMap(responses) {
-    return mapValues(responses, this.transformResponse, this);
   }
 
 
@@ -510,7 +390,8 @@ class OpenApiTransformerBase {
     const newParameter = { ...parameter };
 
     if (parameter.content !== undefined) {
-      newParameter.content = this.transformMediaTypeMap(parameter.content);
+      newParameter.content =
+        mapValues(parameter.content, this.transformMediaType, this);
     }
 
     if (parameter.schema !== undefined) {
@@ -522,39 +403,11 @@ class OpenApiTransformerBase {
     }
 
     if (parameter.examples !== undefined) {
-      newParameter.examples = this.transformExample3Map(parameter.examples);
+      newParameter.examples =
+        mapValues(parameter.examples, this.transformExample3, this);
     }
 
     return newParameter;
-  }
-
-
-  /** Transforms an Array of {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#parameterObject
-   * Parameter Object}.
-   *
-   * This occurs for operation.parameters and pathItem.parameters.
-   *
-   * @param {!Array<!Object>} parameters Array of Parameter Object.
-   * @return {!Array<!Object>} Transformed Array of Parameter Object.
-   */
-  transformParameterArray(parameters) {
-    return mapValues(parameters, this.transformParameter, this);
-  }
-
-
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#parameterObject
-   * Parameter Object}.
-   *
-   * This occurs for components.parameters and openApi.parameters.
-   *
-   * @param {!Object<string,!Object>} parameters Map from string to Parameter
-   * Object.
-   * @return {!Object<string,!Object>} Transformed Map of Parameter Object.
-   */
-  transformParameterMap(parameters) {
-    return mapValues(parameters, this.transformParameter, this);
   }
 
 
@@ -567,21 +420,6 @@ class OpenApiTransformerBase {
    */
   transformCallback(callback) {
     return mapValues(callback, this.transformPathItem, this);
-  }
-
-
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#callbackObject
-   * Callback Object}.
-   *
-   * This occurs for operation.callbacks.
-   *
-   * @param {!Object<string,!Object>} callbacks Map from string to Callback
-   * Object.
-   * @return {!Object<string,!Object>} Transformed Map of Callback Object.
-   */
-  transformCallbackMap(callbacks) {
-    return mapValues(callbacks, this.transformCallback, this);
   }
 
 
@@ -601,23 +439,8 @@ class OpenApiTransformerBase {
 
     return {
       ...requestBody,
-      content: this.transformMediaTypeMap(requestBody.content),
+      content: mapValues(requestBody.content, this.transformMediaType, this),
     };
-  }
-
-
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#requestBodyObject
-   * Request Body Object}.
-   *
-   * This occurs for components.requestBodies.
-   *
-   * @param {!Object<string,!Object>} requestBodies Map from string to Request
-   * Body Object.
-   * @return {!Object<string,!Object>} Transformed Map of Request Body Object.
-   */
-  transformRequestBodyMap(requestBodies) {
-    return mapValues(requestBodies, this.transformRequestBody, this);
   }
 
 
@@ -642,7 +465,7 @@ class OpenApiTransformerBase {
 
     if (operation.parameters !== undefined) {
       newOperation.parameters =
-        this.transformParameterArray(operation.parameters);
+        mapValues(operation.parameters, this.transformParameter, this);
     }
 
     if (operation.requestBody && operation.requestBody.content) {
@@ -651,11 +474,13 @@ class OpenApiTransformerBase {
     }
 
     if (operation.responses !== undefined) {
-      newOperation.responses = this.transformResponseMap(operation.responses);
+      newOperation.responses =
+        mapValues(operation.responses, this.transformResponse, this);
     }
 
     if (operation.callbacks !== undefined) {
-      newOperation.callbacks = this.transformCallbackMap(operation.callbacks);
+      newOperation.callbacks =
+        mapValues(operation.callbacks, this.transformCallback, this);
     }
 
     return newOperation;
@@ -678,7 +503,7 @@ class OpenApiTransformerBase {
 
     if (pathItem.parameters !== undefined) {
       newPathItem.parameters =
-        this.transformParameterArray(pathItem.parameters);
+        mapValues(pathItem.parameters, this.transformParameter, this);
     }
 
     PATH_METHODS.forEach((method) => {
@@ -718,42 +543,51 @@ class OpenApiTransformerBase {
     const newComponents = { ...components };
 
     if (components.schemas !== undefined) {
-      newComponents.schemas = this.transformSchemaMap(components.schemas);
+      newComponents.schemas =
+        mapValues(components.schemas, this.transformSchema, this);
     }
 
     if (components.responses !== undefined) {
-      newComponents.responses = this.transformResponseMap(components.responses);
+      newComponents.responses =
+        mapValues(components.responses, this.transformResponse, this);
     }
 
     if (components.parameters !== undefined) {
       newComponents.parameters =
-        this.transformParameterMap(components.parameters);
+        mapValues(components.parameters, this.transformParameter, this);
     }
 
     if (components.examples !== undefined) {
-      newComponents.examples = this.transformExample3Map(components.examples);
+      newComponents.examples =
+        mapValues(components.examples, this.transformExample3, this);
     }
 
     if (components.requestBodies !== undefined) {
       newComponents.requestBodies =
-        this.transformRequestBodyMap(components.requestBodies);
+        mapValues(components.requestBodies, this.transformRequestBody, this);
     }
 
     if (components.headers !== undefined) {
-      newComponents.headers = this.transformHeaderMap(components.headers);
+      newComponents.headers =
+        mapValues(components.headers, this.transformHeader, this);
     }
 
     if (components.securitySchemes !== undefined) {
-      newComponents.securitySchemes =
-        this.transformSecuritySchemeMap(components.securitySchemes);
+      newComponents.securitySchemes = mapValues(
+        components.securitySchemes,
+        this.transformSecurityScheme,
+        this,
+      );
     }
 
     if (components.links !== undefined) {
-      newComponents.links = this.transformLinkMap(components.links);
+      newComponents.links =
+        mapValues(components.links, this.transformLink, this);
     }
 
     if (components.callbacks !== undefined) {
-      newComponents.callbacks = this.transformCallbackMap(components.callbacks);
+      newComponents.callbacks =
+        mapValues(components.callbacks, this.transformCallback, this);
     }
 
     return newComponents;
@@ -773,22 +607,6 @@ class OpenApiTransformerBase {
   }
 
 
-  /** Transforms a Map from string to {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#serverVariableObject
-   * Server Variable Object}.
-   *
-   * This occurs for server.variables.
-   *
-   * @param {!Object<string,!Object>} serverVariables Map from string to
-   * Server Variable Object.
-   * @return {!Object<string,!Object>} Transformed Map of Server Variable
-   * Object.
-   */
-  transformServerVariableMap(serverVariables) {
-    return mapValues(serverVariables, this.transformServerVariable, this);
-  }
-
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#serverObject
    * Server Object}.
@@ -805,22 +623,9 @@ class OpenApiTransformerBase {
 
     return {
       ...server,
-      variables: this.transformServerVariableMap(server.variables),
+      variables:
+        mapValues(server.variables, this.transformServerVariable, this),
     };
-  }
-
-
-  /** Transforms an Array of {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#serverObject
-   * Server Object}.
-   *
-   * This occurs for components.servers.
-   *
-   * @param {!Array<!Object>} servers Array of Server Object.
-   * @return {!Object<string,!Object>} Transformed Array of Server Object.
-   */
-  transformServers(servers) {
-    return mapValues(servers, this.transformServer, this);
   }
 
 
@@ -894,22 +699,6 @@ class OpenApiTransformerBase {
   }
 
 
-  /** Transforms an Array of {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#securitySchemeObject
-   * Security Scheme Object}.
-   *
-   * This occurs for components.security.
-   *
-   * @param {!Array<!Object>} securitySchemes Array of Security
-   * Scheme Object.
-   * @return {!Object<string,!Object>} Transformed Array of Security
-   * Scheme Object.
-   */
-  transformSecuritySchemes(securitySchemes) {
-    return mapValues(securitySchemes, this.transformSecurityScheme, this);
-  }
-
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#securityRequirementObject
    * Security Requirement Object}.
@@ -920,26 +709,6 @@ class OpenApiTransformerBase {
   // eslint-disable-next-line class-methods-use-this
   transformSecurityRequirement(securityRequirement) {
     return securityRequirement;
-  }
-
-
-  /** Transforms an Array of {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#securityRequirementObject
-   * Security Requirement Object}.
-   *
-   * This occurs for components.security.
-   *
-   * @param {!Array<!Object>} securityRequirements Array of Security
-   * Requirement Object.
-   * @return {!Object<string,!Object>} Transformed Array of Security
-   * Requirement Object.
-   */
-  transformSecurityRequirements(securityRequirements) {
-    return mapValues(
-      securityRequirements,
-      this.transformSecurityRequirement,
-      this,
-    );
   }
 
 
@@ -961,20 +730,6 @@ class OpenApiTransformerBase {
       ...tag,
       externalDocs: this.transformExternalDocs(tag.externalDocs),
     };
-  }
-
-
-  /** Transforms an Array of {@link
-   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tagObject
-   * Tag Object}.
-   *
-   * This occurs for components.tags.
-   *
-   * @param {!Array<!Object>} tags Array of Tag Object.
-   * @return {!Object<string,!Object>} Transformed Array of Tag Object.
-   */
-  transformTags(tags) {
-    return mapValues(tags, this.transformTag, this);
   }
 
 
@@ -1053,7 +808,8 @@ class OpenApiTransformerBase {
     }
 
     if (openApi.servers !== undefined) {
-      newOpenApi.servers = this.transformServers(openApi.servers);
+      newOpenApi.servers =
+        mapValues(openApi.servers, this.transformServer, this);
     }
 
     if (openApi.components !== undefined) {
@@ -1061,15 +817,18 @@ class OpenApiTransformerBase {
     }
 
     if (openApi.definitions !== undefined) {
-      newOpenApi.definitions = this.transformSchemaMap(openApi.definitions);
+      newOpenApi.definitions =
+        mapValues(openApi.definitions, this.transformSchema, this);
     }
 
     if (openApi.parameters !== undefined) {
-      newOpenApi.parameters = this.transformParameterMap(openApi.parameters);
+      newOpenApi.parameters =
+        mapValues(openApi.parameters, this.transformParameter, this);
     }
 
     if (openApi.responses !== undefined) {
-      newOpenApi.responses = this.transformResponseMap(openApi.responses);
+      newOpenApi.responses =
+        mapValues(openApi.responses, this.transformResponse, this);
     }
 
     if (openApi.paths !== undefined) {
@@ -1077,12 +836,15 @@ class OpenApiTransformerBase {
     }
 
     if (openApi.security !== undefined) {
-      newOpenApi.security =
-        this.transformSecurityRequirementMap(openApi.security);
+      newOpenApi.security = mapValues(
+        openApi.security,
+        this.transformSecurityRequirement,
+        this,
+      );
     }
 
     if (openApi.tags !== undefined) {
-      newOpenApi.tags = this.transformTagMap(openApi.tags);
+      newOpenApi.tags = mapValues(openApi.tags, this.transformTag, this);
     }
 
     if (openApi.externalDocs !== undefined) {
