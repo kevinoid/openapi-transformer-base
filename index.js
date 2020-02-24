@@ -208,7 +208,7 @@ class OpenApiTransformerBase {
       }
     }
 
-    ['not'].forEach((schemaProp) => {
+    ['if', 'then', 'else', 'not'].forEach((schemaProp) => {
       const subSchema = schema[schemaProp];
       if (subSchema !== undefined) {
         newSchema[schemaProp] = this.transformSchema(subSchema);
