@@ -189,14 +189,6 @@ class OpenApiTransformerBase {
       newSchema.xml = this.transformXml(schema.xml);
     }
 
-    // Note: additionalProperties can be boolean or schema (before OpenAPI 3.1)
-    const { additionalProperties } = schema;
-    if (additionalProperties !== undefined
-      && typeof additionalProperties !== 'boolean') {
-      newSchema.additionalProperties =
-        this.transformSchema(additionalProperties);
-    }
-
     // Note: OpenAPI 3.0 disallows Arrays, 2.0 and 3.1 drafts allow it
     const { items } = schema;
     if (items !== undefined) {
@@ -219,6 +211,16 @@ class OpenApiTransformerBase {
       newSchema.properties =
         mapValues(schema.properties, this.transformSchema, this);
     }
+
+    // Note: additionalProperties can be boolean or schema (before OpenAPI 3.1)
+    // additionalItems can be boolean or schema in all OpenAPI versions
+    ['additionalItems', 'additionalProperties'].forEach((schemaProp) => {
+      const additionalItemsProps = schema[schemaProp];
+      if (additionalItemsProps !== undefined
+        && typeof additionalItemsProps !== 'boolean') {
+        newSchema[schemaProp] = this.transformSchema(additionalItemsProps);
+      }
+    });
 
     if (schema.dependentSchemas !== undefined) {
       newSchema.dependentSchemas =
