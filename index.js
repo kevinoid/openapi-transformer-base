@@ -226,12 +226,14 @@ class OpenApiTransformerBase {
       newSchema.propertyNames = this.transformSchema(schema.propertyNames);
     }
 
-    // Note: additionalProperties can be boolean or schema (before OpenAPI 3.1)
-    // additionalItems can be boolean or schema in all OpenAPI versions
+    // Note: JSON Schema Core draft-handrews-json-schema-02 (referenced by
+    // current/ OpenAPI 3.1 drafts) defines true and false as valid schemas
+    // with true equivalent to {} and false equivalent to {not:{}}
+    // https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.3.2
+    // so they are now passed to transformSchema.
     ['additionalItems', 'additionalProperties'].forEach((schemaProp) => {
       const additionalItemsProps = schema[schemaProp];
-      if (additionalItemsProps !== undefined
-        && typeof additionalItemsProps !== 'boolean') {
+      if (additionalItemsProps !== undefined) {
         newSchema[schemaProp] = this.transformSchema(additionalItemsProps);
       }
     });
