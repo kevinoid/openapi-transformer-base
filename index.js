@@ -20,7 +20,6 @@ const PATH_METHODS = [
   'trace',
 ];
 
-
 /** Creates a copy of an object with values from a transform function.
  *
  * i.e. Array.prototype.map for objects.
@@ -54,7 +53,6 @@ function mapValues(obj, transform, thisArg) {
       Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj)),
     );
 }
-
 
 /** Base class for traversing or transforming OpenAPI 2.x or 3.x documents
  * using a modified visitor design pattern to traverse object types within
@@ -105,7 +103,6 @@ class OpenApiTransformerBase {
     return discriminator;
   }
 
-
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#exampleObject
    * OpenAPI 2.0 Example Object}.
@@ -117,7 +114,6 @@ class OpenApiTransformerBase {
   transformExample(example) {
     return example;
   }
-
 
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#exampleObject
@@ -131,7 +127,6 @@ class OpenApiTransformerBase {
     return example;
   }
 
-
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#externalDocumentationObject
    * External Documentation Object}.
@@ -144,7 +139,6 @@ class OpenApiTransformerBase {
     return externalDocs;
   }
 
-
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#xmlObject
    * XML Object}.
@@ -156,7 +150,6 @@ class OpenApiTransformerBase {
   transformXml(xml) {
     return xml;
   }
-
 
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#schemaObject
@@ -267,7 +260,6 @@ class OpenApiTransformerBase {
     return newSchema;
   }
 
-
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#itemsObject
    * Items Object}.
@@ -291,7 +283,6 @@ class OpenApiTransformerBase {
     };
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#headerObject
    * Header Object}.
@@ -311,7 +302,6 @@ class OpenApiTransformerBase {
       schema: this.transformSchema(header.schema),
     };
   }
-
 
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#encodingObject
@@ -333,7 +323,6 @@ class OpenApiTransformerBase {
     };
   }
 
-
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#linkObject
    * Link Object}.
@@ -353,7 +342,6 @@ class OpenApiTransformerBase {
       server: this.transformServer(link.server),
     };
   }
-
 
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#mediaTypeObject
@@ -380,7 +368,6 @@ class OpenApiTransformerBase {
 
     return newMediaType;
   }
-
 
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#responseObject
@@ -422,7 +409,6 @@ class OpenApiTransformerBase {
     return newResponse;
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#parameterObject
    * Parameter Object}.
@@ -461,7 +447,6 @@ class OpenApiTransformerBase {
     return newParameter;
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#callbackObject
    * Callback Object}.
@@ -472,7 +457,6 @@ class OpenApiTransformerBase {
   transformCallback(callback) {
     return mapValues(callback, this.transformPathItem, this);
   }
-
 
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#requestBodyObject
@@ -493,7 +477,6 @@ class OpenApiTransformerBase {
       content: mapValues(requestBody.content, this.transformMediaType, this),
     };
   }
-
 
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operationObject
@@ -553,7 +536,6 @@ class OpenApiTransformerBase {
     return newOperation;
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#pathItemObject
    * Path Item Object}.
@@ -582,7 +564,6 @@ class OpenApiTransformerBase {
     return newPathItem;
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#pathsObject
    * Paths Object}.
@@ -593,7 +574,6 @@ class OpenApiTransformerBase {
   transformPaths(paths) {
     return mapValues(paths, this.transformPathItem, this);
   }
-
 
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#componentsObject
@@ -660,7 +640,6 @@ class OpenApiTransformerBase {
     return newComponents;
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#serverVariableObject
    * Server Variable Object}.
@@ -672,7 +651,6 @@ class OpenApiTransformerBase {
   transformServerVariable(serverVariable) {
     return serverVariable;
   }
-
 
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#serverObject
@@ -695,7 +673,6 @@ class OpenApiTransformerBase {
     };
   }
 
-
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#oauthFlowObject
    * OAuth Flow Object}.
@@ -707,7 +684,6 @@ class OpenApiTransformerBase {
   transformOAuthFlow(flow) {
     return flow;
   }
-
 
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#oauthFlowsObject
@@ -744,7 +720,6 @@ class OpenApiTransformerBase {
     return newFlows;
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#securitySchemeObject
    * Security Scheme Object}.
@@ -765,7 +740,6 @@ class OpenApiTransformerBase {
     };
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#securityRequirementObject
    * Security Requirement Object}.
@@ -777,7 +751,6 @@ class OpenApiTransformerBase {
   transformSecurityRequirement(securityRequirement) {
     return securityRequirement;
   }
-
 
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tagObject
@@ -799,7 +772,6 @@ class OpenApiTransformerBase {
     };
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#contactObject
    * Contact Object}.
@@ -812,7 +784,6 @@ class OpenApiTransformerBase {
     return contact;
   }
 
-
   /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#licenseObject
    * License Object}.
@@ -824,7 +795,6 @@ class OpenApiTransformerBase {
   transformLicense(license) {
     return license;
   }
-
 
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#infoObject
@@ -850,7 +820,6 @@ class OpenApiTransformerBase {
 
     return info;
   }
-
 
   /** Transforms an {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#oasObject
