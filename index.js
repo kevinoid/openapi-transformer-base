@@ -7,6 +7,7 @@
 
 /** HTTP method names which are properties of a Path Item Object that have
  * Operation Object values.
+ *
  * @private
  */
 const PATH_METHODS = [
@@ -36,7 +37,7 @@ const PATH_METHODS = [
  * @param {T} obj Object for which to map values.
  * @param {function(*): *} transform Function which maps input to output values.
  * @param {*} thisArg Value passed to `transform` as `this`.
- * @return {T} Object with same prototype and keys as `obj`, where the
+ * @returns {T} Object with same prototype and keys as `obj`, where the
  * value for each key is the result of calling `transform` on `obj[key]`.
  */
 function mapValues(obj, transform, thisArg) {
@@ -95,8 +96,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#discriminatorObject
    * Discriminator Object}.
    *
-   * @param {!Object} discriminator Discriminator Object.
-   * @return {!Object} Transformed Discriminator Object.
+   * @param {!object} discriminator Discriminator Object.
+   * @returns {!object} Transformed Discriminator Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformDiscriminator(discriminator) {
@@ -107,8 +108,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#exampleObject
    * OpenAPI 2.0 Example Object}.
    *
-   * @param {!Object} example OpenAPI 2.0 Example Object.
-   * @return {!Object} Transformed Example Object.
+   * @param {!object} example OpenAPI 2.0 Example Object.
+   * @returns {!object} Transformed Example Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformExample(example) {
@@ -119,8 +120,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#exampleObject
    * OpenAPI 3.x Example Object}.
    *
-   * @param {!Object} example OpenAPI 3.x Example Object.
-   * @return {!Object} Transformed Example Object.
+   * @param {!object} example OpenAPI 3.x Example Object.
+   * @returns {!object} Transformed Example Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformExample3(example) {
@@ -131,8 +132,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#externalDocumentationObject
    * External Documentation Object}.
    *
-   * @param {!Object} externalDocs External Documentation Object.
-   * @return {!Object} Transformed External Documentation Object.
+   * @param {!object} externalDocs External Documentation Object.
+   * @returns {!object} Transformed External Documentation Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformExternalDocs(externalDocs) {
@@ -143,8 +144,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#xmlObject
    * XML Object}.
    *
-   * @param {!Object} xml XML Object.
-   * @return {!Object} Transformed XML Object.
+   * @param {!object} xml XML Object.
+   * @returns {!object} Transformed XML Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformXml(xml) {
@@ -159,8 +160,8 @@ class OpenApiTransformerBase {
    * {@see transformParameter} and {@see transformItems} to transform all
    * schema-like objects.
    *
-   * @param {!Object} schema Schema Object.
-   * @return {!Object} Transformed Schema Object.
+   * @param {!object} schema Schema Object.
+   * @returns {!object} Transformed Schema Object.
    */
   transformSchema(schema) {
     if (typeof schema !== 'object' || schema === null) {
@@ -168,23 +169,34 @@ class OpenApiTransformerBase {
     }
 
     const newSchema = { ...schema };
+    const {
+      contains,
+      dependentSchemas,
+      discriminator,
+      externalDocs,
+      items,
+      patternProperties,
+      properties,
+      propertyNames,
+      unevaluatedItems,
+      unevaluatedProperties,
+      xml,
+    } = schema;
 
-    if (schema.discriminator !== undefined) {
-      newSchema.discriminator =
-        this.transformDiscriminator(schema.discriminator);
+    if (discriminator !== undefined) {
+      newSchema.discriminator = this.transformDiscriminator(discriminator);
     }
 
-    if (schema.externalDocs !== undefined) {
-      newSchema.externalDocs = this.transformExternalDocs(schema.externalDocs);
+    if (externalDocs !== undefined) {
+      newSchema.externalDocs = this.transformExternalDocs(externalDocs);
     }
 
-    if (schema.xml !== undefined) {
-      newSchema.xml = this.transformXml(schema.xml);
+    if (xml !== undefined) {
+      newSchema.xml = this.transformXml(xml);
     }
 
-    // Note: OpenAPI 3.0 disallows Arrays, 2.0 and 3.1 drafts allow it
-    const { items } = schema;
     if (items !== undefined) {
+      // Note: OpenAPI 3.0 disallows Arrays, 2.0 and 3.1 drafts allow it
       if (Array.isArray(items)) {
         newSchema.items =
           mapValues(items, this.transformSchema, this);
@@ -193,30 +205,30 @@ class OpenApiTransformerBase {
       }
     }
 
-    ['if', 'then', 'else', 'not'].forEach((schemaProp) => {
+    for (const schemaProp of ['if', 'then', 'else', 'not']) {
       const subSchema = schema[schemaProp];
       if (subSchema !== undefined) {
         newSchema[schemaProp] = this.transformSchema(subSchema);
       }
-    });
+    }
 
-    if (schema.properties !== undefined) {
+    if (properties !== undefined) {
       newSchema.properties =
-        mapValues(schema.properties, this.transformSchema, this);
+        mapValues(properties, this.transformSchema, this);
     }
 
-    if (schema.patternProperties !== undefined) {
+    if (patternProperties !== undefined) {
       newSchema.patternProperties =
-        mapValues(schema.patternProperties, this.transformSchema, this);
+        mapValues(patternProperties, this.transformSchema, this);
     }
 
-    if (schema.unevaluatedProperties !== undefined) {
+    if (unevaluatedProperties !== undefined) {
       newSchema.unevaluatedProperties =
-        this.transformSchema(schema.unevaluatedProperties);
+        this.transformSchema(unevaluatedProperties);
     }
 
-    if (schema.propertyNames !== undefined) {
-      newSchema.propertyNames = this.transformSchema(schema.propertyNames);
+    if (propertyNames !== undefined) {
+      newSchema.propertyNames = this.transformSchema(propertyNames);
     }
 
     // Note: JSON Schema Core draft-handrews-json-schema-02 (referenced by
@@ -224,34 +236,34 @@ class OpenApiTransformerBase {
     // with true equivalent to {} and false equivalent to {not:{}}
     // https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.3.2
     // so they are now passed to transformSchema.
-    ['additionalItems', 'additionalProperties'].forEach((schemaProp) => {
+    for (const schemaProp of ['additionalItems', 'additionalProperties']) {
       const additionalItemsProps = schema[schemaProp];
       if (additionalItemsProps !== undefined) {
         newSchema[schemaProp] = this.transformSchema(additionalItemsProps);
       }
-    });
+    }
 
-    if (schema.unevaluatedItems !== undefined) {
+    if (unevaluatedItems !== undefined) {
       newSchema.unevaluatedItems =
-        this.transformSchema(schema.unevaluatedItems);
+        this.transformSchema(unevaluatedItems);
     }
 
-    if (schema.dependentSchemas !== undefined) {
+    if (dependentSchemas !== undefined) {
       newSchema.dependentSchemas =
-        mapValues(schema.dependentSchemas, this.transformSchema, this);
+        mapValues(dependentSchemas, this.transformSchema, this);
     }
 
-    if (schema.contains !== undefined) {
-      newSchema.contains = this.transformSchema(schema.contains);
+    if (contains !== undefined) {
+      newSchema.contains = this.transformSchema(contains);
     }
 
-    ['allOf', 'anyOf', 'oneOf'].forEach((schemaProp) => {
+    for (const schemaProp of ['allOf', 'anyOf', 'oneOf']) {
       const subSchemas = schema[schemaProp];
       if (subSchemas !== undefined) {
         newSchema[schemaProp] =
           mapValues(subSchemas, this.transformSchema, this);
       }
-    });
+    }
 
     // Note: The examples property is an Array of values, as defined by JSON
     // Schema, and is therefore not suitable for any transformExample* method.
@@ -267,8 +279,8 @@ class OpenApiTransformerBase {
    * Note: Items Object is a subset of Schema Object with the addition of
    * collectionFormat.
    *
-   * @param {!Object} items Items Object.
-   * @return {!Object} Transformed Items Object.
+   * @param {!object} items Items Object.
+   * @returns {!object} Transformed Items Object.
    */
   transformItems(items) {
     if (typeof items !== 'object'
@@ -287,8 +299,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#headerObject
    * Header Object}.
    *
-   * @param {!Object} header Header Object.
-   * @return {!Object} Transformed Header Object.
+   * @param {!object} header Header Object.
+   * @returns {!object} Transformed Header Object.
    */
   transformHeader(header) {
     if (typeof header !== 'object'
@@ -307,8 +319,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#encodingObject
    * Encoding Object}.
    *
-   * @param {!Object} encoding Encoding Object.
-   * @return {!Object} Transformed Encoding Object.
+   * @param {!object} encoding Encoding Object.
+   * @returns {!object} Transformed Encoding Object.
    */
   transformEncoding(encoding) {
     if (typeof encoding !== 'object'
@@ -327,8 +339,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#linkObject
    * Link Object}.
    *
-   * @param {!Object} link Link Object.
-   * @return {!Object} Transformed Link Object.
+   * @param {!object} link Link Object.
+   * @returns {!object} Transformed Link Object.
    */
   transformLink(link) {
     if (typeof link !== 'object'
@@ -347,8 +359,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#mediaTypeObject
    * Media Type Object}.
    *
-   * @param {!Object} mediaType Media Type Object.
-   * @return {!Object} Transformed Media Type Object.
+   * @param {!object} mediaType Media Type Object.
+   * @returns {!object} Transformed Media Type Object.
    */
   transformMediaType(mediaType) {
     if (typeof mediaType !== 'object' || mediaType === null) {
@@ -373,8 +385,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#responseObject
    * Response Object}.
    *
-   * @param {!Object} response Response Object.
-   * @return {!Object} Transformed Response Object.
+   * @param {!object} response Response Object.
+   * @returns {!object} Transformed Response Object.
    */
   transformResponse(response) {
     if (typeof response !== 'object' || response === null) {
@@ -416,8 +428,8 @@ class OpenApiTransformerBase {
    * Note: In OpenAPI 2.0, Parameter Object shares many properties with
    * Schema Object (when <code>.in !== 'body'</code>).
    *
-   * @param {!Object} parameter Parameter Object.
-   * @return {!Object} Transformed Parameter Object.
+   * @param {!object} parameter Parameter Object.
+   * @returns {!object} Transformed Parameter Object.
    */
   transformParameter(parameter) {
     if (typeof parameter !== 'object' || parameter === null) {
@@ -451,8 +463,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#callbackObject
    * Callback Object}.
    *
-   * @param {!Object} callback Callback Object.
-   * @return {!Object} Transformed Callback Object.
+   * @param {!object} callback Callback Object.
+   * @returns {!object} Transformed Callback Object.
    */
   transformCallback(callback) {
     return mapValues(callback, this.transformPathItem, this);
@@ -462,8 +474,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#requestBodyObject
    * Request Body Object}.
    *
-   * @param {!Object} requestBody Request Body Object.
-   * @return {!Object} Transformed Request Body Object.
+   * @param {!object} requestBody Request Body Object.
+   * @returns {!object} Transformed Request Body Object.
    */
   transformRequestBody(requestBody) {
     if (typeof requestBody !== 'object'
@@ -482,8 +494,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operationObject
    * Operation Object}.
    *
-   * @param {!Object} operation Operation Object.
-   * @return {!Object} Transformed Operation Object.
+   * @param {!object} operation Operation Object.
+   * @returns {!object} Transformed Operation Object.
    */
   transformOperation(operation) {
     if (typeof operation !== 'object' || operation === null) {
@@ -540,8 +552,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#pathItemObject
    * Path Item Object}.
    *
-   * @param {!Object} pathItem Path Item Object.
-   * @return {!Object} Transformed Path Item Object.
+   * @param {!object} pathItem Path Item Object.
+   * @returns {!object} Transformed Path Item Object.
    */
   transformPathItem(pathItem) {
     if (typeof pathItem !== 'object' || pathItem === null) {
@@ -555,11 +567,11 @@ class OpenApiTransformerBase {
         mapValues(pathItem.parameters, this.transformParameter, this);
     }
 
-    PATH_METHODS.forEach((method) => {
+    for (const method of PATH_METHODS) {
       if (hasOwnProperty.call(pathItem, method)) {
         newPathItem[method] = this.transformOperation(pathItem[method]);
       }
-    });
+    }
 
     return newPathItem;
   }
@@ -568,8 +580,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#pathsObject
    * Paths Object}.
    *
-   * @param {!Object} paths Paths Object.
-   * @return {!Object} Transformed Paths Object.
+   * @param {!object} paths Paths Object.
+   * @returns {!object} Transformed Paths Object.
    */
   transformPaths(paths) {
     return mapValues(paths, this.transformPathItem, this);
@@ -579,8 +591,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#componentsObject
    * Components Object}.
    *
-   * @param {!Object} components Components Object.
-   * @return {!Object} Transformed Components Object.
+   * @param {!object} components Components Object.
+   * @returns {!object} Transformed Components Object.
    */
   transformComponents(components) {
     if (typeof components !== 'object' || components === null) {
@@ -644,8 +656,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#serverVariableObject
    * Server Variable Object}.
    *
-   * @param {!Object} serverVariable Server Variable Object.
-   * @return {!Object} Transformed Server Variable Object.
+   * @param {!object} serverVariable Server Variable Object.
+   * @returns {!object} Transformed Server Variable Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformServerVariable(serverVariable) {
@@ -656,8 +668,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#serverObject
    * Server Object}.
    *
-   * @param {!Object} server Server Object.
-   * @return {!Object} Transformed Server Object.
+   * @param {!object} server Server Object.
+   * @returns {!object} Transformed Server Object.
    */
   transformServer(server) {
     if (typeof server !== 'object'
@@ -677,8 +689,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#oauthFlowObject
    * OAuth Flow Object}.
    *
-   * @param {!Object} flow OAuth Flow Object.
-   * @return {!Object} Transformed OAuth Flow Object.
+   * @param {!object} flow OAuth Flow Object.
+   * @returns {!object} Transformed OAuth Flow Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformOAuthFlow(flow) {
@@ -689,8 +701,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#oauthFlowsObject
    * OAuth Flows Object}.
    *
-   * @param {!Object} flows OAuth Flows Object.
-   * @return {!Object} Transformed OAuth Flows Object.
+   * @param {!object} flows OAuth Flows Object.
+   * @returns {!object} Transformed OAuth Flows Object.
    */
   transformOAuthFlows(flows) {
     if (typeof flows !== 'object' || flows === null) {
@@ -724,8 +736,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#securitySchemeObject
    * Security Scheme Object}.
    *
-   * @param {!Object} securityScheme Security Scheme Object.
-   * @return {!Object} Transformed Security Scheme Object.
+   * @param {!object} securityScheme Security Scheme Object.
+   * @returns {!object} Transformed Security Scheme Object.
    */
   transformSecurityScheme(securityScheme) {
     if (typeof securityScheme !== 'object'
@@ -744,8 +756,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#securityRequirementObject
    * Security Requirement Object}.
    *
-   * @param {!Object} securityRequirement Security Requirement Object.
-   * @return {!Object} Transformed Security Requirement Object.
+   * @param {!object} securityRequirement Security Requirement Object.
+   * @returns {!object} Transformed Security Requirement Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformSecurityRequirement(securityRequirement) {
@@ -756,8 +768,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tagObject
    * Tag Object}.
    *
-   * @param {!Object} tag Tag Object.
-   * @return {!Object} Transformed Tag Object.
+   * @param {!object} tag Tag Object.
+   * @returns {!object} Transformed Tag Object.
    */
   transformTag(tag) {
     if (typeof tag !== 'object'
@@ -776,8 +788,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#contactObject
    * Contact Object}.
    *
-   * @param {!Object} contact Contact Object.
-   * @return {!Object} Transformed Contact Object.
+   * @param {!object} contact Contact Object.
+   * @returns {!object} Transformed Contact Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformContact(contact) {
@@ -788,8 +800,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#licenseObject
    * License Object}.
    *
-   * @param {!Object} license License Object.
-   * @return {!Object} Transformed License Object.
+   * @param {!object} license License Object.
+   * @returns {!object} Transformed License Object.
    */
   // eslint-disable-next-line class-methods-use-this
   transformLicense(license) {
@@ -800,8 +812,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#infoObject
    * Info Object}.
    *
-   * @param {!Object} info Info Object.
-   * @return {!Object} Transformed Info Object.
+   * @param {!object} info Info Object.
+   * @returns {!object} Transformed Info Object.
    */
   transformInfo(info) {
     if (typeof info !== 'object' || info === null) {
@@ -827,8 +839,8 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object
    * OpenAPI 2.0 (fka Swagger) Object}.
    *
-   * @param {!Object} openApi OpenAPI Object.
-   * @return {!Object} Transformed OpenAPI Object.
+   * @param {!object} openApi OpenAPI Object.
+   * @returns {!object} Transformed OpenAPI Object.
    */
   transformOpenApi(openApi) {
     if (typeof openApi !== 'object' || openApi === null) {
