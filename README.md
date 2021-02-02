@@ -1,9 +1,8 @@
 OpenApiTransformerBase
 ======================
 
-[![Build Status: Linux](https://img.shields.io/travis/kevinoid/openapi-transformer-base/master.svg?style=flat&label=build+on+linux)](https://travis-ci.org/kevinoid/openapi-transformer-base)
-[![Build Status: Windows](https://img.shields.io/appveyor/ci/kevinoid/openapi-transformer-base/master.svg?style=flat&label=build+on+windows)](https://ci.appveyor.com/project/kevinoid/openapi-transformer-base)
-[![Coverage](https://img.shields.io/codecov/c/github/kevinoid/openapi-transformer-base.svg?style=flat)](https://codecov.io/github/kevinoid/openapi-transformer-base?branch=master)
+[![Build Status](https://img.shields.io/github/workflow/status/kevinoid/openapi-transformer-base/Node.js%20CI/main.svg?style=flat&label=build)](https://github.com/kevinoid/openapi-transformer-base/actions?query=branch%3Amain)
+[![Coverage](https://img.shields.io/codecov/c/github/kevinoid/openapi-transformer-base.svg?style=flat)](https://codecov.io/github/kevinoid/openapi-transformer-base?branch=main)
 [![Dependency Status](https://img.shields.io/david/kevinoid/openapi-transformer-base.svg?style=flat)](https://david-dm.org/kevinoid/openapi-transformer-base)
 [![Supported Node Version](https://img.shields.io/node/v/openapi-transformer-base.svg?style=flat)](https://www.npmjs.com/package/openapi-transformer-base)
 [![Version on NPM](https://img.shields.io/npm/v/openapi-transformer-base.svg?style=flat)](https://www.npmjs.com/package/openapi-transformer-base)
