@@ -181,7 +181,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Schema Object.
    */
   transformSchema(schema) {
-    if (typeof schema !== 'object' || schema === null) {
+    if (typeof schema !== 'object' || schema === null || isArray(schema)) {
       return schema;
     }
 
@@ -300,6 +300,7 @@ class OpenApiTransformerBase {
   transformItems(items) {
     if (typeof items !== 'object'
       || items === null
+      || isArray(items)
       || items.items === undefined) {
       return items;
     }
@@ -320,6 +321,7 @@ class OpenApiTransformerBase {
   transformHeader(header) {
     if (typeof header !== 'object'
       || header === null
+      || isArray(header)
       || header.schema === undefined) {
       return header;
     }
@@ -340,6 +342,7 @@ class OpenApiTransformerBase {
   transformEncoding(encoding) {
     if (typeof encoding !== 'object'
       || encoding === null
+      || isArray(encoding)
       || encoding.headers === undefined) {
       return encoding;
     }
@@ -360,6 +363,7 @@ class OpenApiTransformerBase {
   transformLink(link) {
     if (typeof link !== 'object'
       || link === null
+      || isArray(link)
       || link.server === undefined) {
       return link;
     }
@@ -378,7 +382,9 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Media Type Object.
    */
   transformMediaType(mediaType) {
-    if (typeof mediaType !== 'object' || mediaType === null) {
+    if (typeof mediaType !== 'object'
+      || mediaType === null
+      || isArray(mediaType)) {
       return mediaType;
     }
 
@@ -404,7 +410,9 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Response Object.
    */
   transformResponse(response) {
-    if (typeof response !== 'object' || response === null) {
+    if (typeof response !== 'object'
+      || response === null
+      || isArray(response)) {
       return response;
     }
 
@@ -447,7 +455,9 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Parameter Object.
    */
   transformParameter(parameter) {
-    if (typeof parameter !== 'object' || parameter === null) {
+    if (typeof parameter !== 'object'
+      || parameter === null
+      || isArray(parameter)) {
       return parameter;
     }
 
@@ -482,7 +492,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Response Object.
    */
   transformResponses(responses) {
-    if (!responses || typeof responses !== 'object') {
+    if (!responses || typeof responses !== 'object' || isArray(responses)) {
       return responses;
     }
 
@@ -526,6 +536,7 @@ class OpenApiTransformerBase {
   transformRequestBody(requestBody) {
     if (typeof requestBody !== 'object'
       || requestBody === null
+      || isArray(requestBody)
       || requestBody.content === undefined) {
       return requestBody;
     }
@@ -544,7 +555,9 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Operation Object.
    */
   transformOperation(operation) {
-    if (typeof operation !== 'object' || operation === null) {
+    if (typeof operation !== 'object'
+      || operation === null
+      || isArray(operation)) {
       return operation;
     }
 
@@ -594,7 +607,9 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Path Item Object.
    */
   transformPathItem(pathItem) {
-    if (typeof pathItem !== 'object' || pathItem === null) {
+    if (typeof pathItem !== 'object'
+      || pathItem === null
+      || isArray(pathItem)) {
       return pathItem;
     }
 
@@ -634,7 +649,9 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Components Object.
    */
   transformComponents(components) {
-    if (typeof components !== 'object' || components === null) {
+    if (typeof components !== 'object'
+      || components === null
+      || isArray(components)) {
       return components;
     }
 
@@ -713,6 +730,7 @@ class OpenApiTransformerBase {
   transformServer(server) {
     if (typeof server !== 'object'
       || server === null
+      || isArray(server)
       || server.variables === undefined) {
       return server;
     }
@@ -744,7 +762,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed OAuth Flows Object.
    */
   transformOAuthFlows(flows) {
-    if (typeof flows !== 'object' || flows === null) {
+    if (typeof flows !== 'object' || flows === null || isArray(flows)) {
       return flows;
     }
 
@@ -781,6 +799,7 @@ class OpenApiTransformerBase {
   transformSecurityScheme(securityScheme) {
     if (typeof securityScheme !== 'object'
       || securityScheme === null
+      || isArray(securityScheme)
       || securityScheme.flows === undefined) {
       return securityScheme;
     }
@@ -813,6 +832,7 @@ class OpenApiTransformerBase {
   transformTag(tag) {
     if (typeof tag !== 'object'
       || tag === null
+      || isArray(tag)
       || tag.externalDocs === undefined) {
       return tag;
     }
@@ -855,7 +875,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Info Object.
    */
   transformInfo(info) {
-    if (typeof info !== 'object' || info === null) {
+    if (typeof info !== 'object' || info === null || isArray(info)) {
       return info;
     }
 
@@ -882,7 +902,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed OpenAPI Object.
    */
   transformOpenApi(openApi) {
-    if (typeof openApi !== 'object' || openApi === null) {
+    if (typeof openApi !== 'object' || openApi === null || isArray(openApi)) {
       return openApi;
     }
 

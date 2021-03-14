@@ -25,6 +25,13 @@ function methodPreservesArgumentType(methodName) {
     });
   }
 
+  it('transforms [] to []', () => {
+    const transformer = new OpenApiTransformerBase();
+    const result = transformer[methodName]([]);
+    assert(Array.isArray(result), 'result isArray');
+    assert.strictEqual(result.length, 0);
+  });
+
   // TODO: Do we care about preserving types not representable in JSON?
   // (e.g. Date, RegExp, Symbol, etc.)
   // TODO: Do we care about preserving the object prototype?
