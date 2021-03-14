@@ -31,7 +31,9 @@ const PATH_METHODS = [
  * Unlike the above:
  * - If the first argument is not an object, it is returned unchanged.
  * - If the first argument is an Array, it is returned unchanged.
- * - The returned object will have the same prototype as the first argument.
+ * - If the first argument is a non-null object, the returned object will be
+ *   a new object with prototype Object.prototype and properties matching the
+ *   first argument with transformed values.
  *
  * @private
  * @template T
@@ -59,7 +61,7 @@ function mapValues(obj, transform, thisArg) {
         newObj[propName] = transform.call(thisArg, obj[propName]);
         return newObj;
       },
-      Object.create(Object.getPrototypeOf(obj)),
+      { ...obj },
     );
 }
 
@@ -477,7 +479,7 @@ class OpenApiTransformerBase {
       return responses;
     }
 
-    const newResponses = Object.create(Object.getPrototypeOf(responses));
+    const newResponses = { ...responses };
     for (const prop of Object.keys(responses)) {
       // Only "default", HTTP response codes, and HTTP response code patterns
       // are defined to contain Response Object.  Other properties may be
