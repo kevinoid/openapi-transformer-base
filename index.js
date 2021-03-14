@@ -461,6 +461,34 @@ class OpenApiTransformerBase {
   }
 
   /** Transforms a {@link
+   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#responsesObject
+   * Responses Object}.
+   *
+   * @param {!object} responses Responses Object.
+   * @returns {!object} Transformed Response Object.
+   */
+  transformResponses(responses) {
+    if (!responses || typeof responses !== 'object') {
+      return responses;
+    }
+
+    const newResponses = Object.create(Object.getPrototypeOf(responses));
+    for (const prop of Object.keys(responses)) {
+      // Only "default", HTTP response codes, and HTTP response code patterns
+      // are defined to contain Response Object.  Other properties may be
+      // extensions or defined as something else in future OpenAPI versions.
+      //
+      // Match using pattern similar to one mentioned in
+      // https://github.com/OAI/OpenAPI-Specification/issues/2471#issuecomment-781362295
+      if (prop === 'default' || /^[1-5]([0-9][0-9]|XX)$/.test(prop)) {
+        newResponses[prop] = this.transformResponse(responses[prop]);
+      }
+    }
+
+    return newResponses;
+  }
+
+  /** Transforms a {@link
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#callbackObject
    * Callback Object}.
    *
@@ -521,8 +549,7 @@ class OpenApiTransformerBase {
     }
 
     if (operation.responses !== undefined) {
-      newOperation.responses =
-        mapValues(operation.responses, this.transformResponse, this);
+      newOperation.responses = this.transformResponses(operation.responses);
     }
 
     if (operation.callbacks !== undefined) {
