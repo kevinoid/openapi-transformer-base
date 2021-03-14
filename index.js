@@ -30,7 +30,7 @@ const PATH_METHODS = [
  *
  * Unlike the above:
  * - If the first argument is not an object, it is returned unchanged.
- * - If the first argument is an Array, a native Array is returned.
+ * - If the first argument is an Array, it is returned unchanged.
  * - The returned object will have the same prototype as the first argument.
  *
  * @private
@@ -46,13 +46,20 @@ function mapValues(obj, transform, thisArg) {
     return obj;
   }
 
+  if (Array.isArray(obj)) {
+    // Note: This function is only called for values specified as Map[X,Y]
+    // in the OpenAPI Specification.  Array values are invalid and it would
+    // be unsafe to assume that their contents are type Y.  Return unchanged.
+    return obj;
+  }
+
   return Object.keys(obj)
     .reduce(
       (newObj, propName) => {
         newObj[propName] = transform.call(thisArg, obj[propName]);
         return newObj;
       },
-      Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj)),
+      Object.create(Object.getPrototypeOf(obj)),
     );
 }
 
