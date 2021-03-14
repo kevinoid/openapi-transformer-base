@@ -55,14 +55,12 @@ function mapValues(obj, transform, thisArg) {
     return obj;
   }
 
-  return Object.keys(obj)
-    .reduce(
-      (newObj, propName) => {
-        newObj[propName] = transform.call(thisArg, obj[propName]);
-        return newObj;
-      },
-      { ...obj },
-    );
+  const newObj = { ...obj };
+  for (const [propName, propValue] of Object.entries(obj)) {
+    newObj[propName] = transform.call(thisArg, propValue);
+  }
+
+  return newObj;
 }
 
 /** Base class for traversing or transforming OpenAPI 2.x or 3.x documents
