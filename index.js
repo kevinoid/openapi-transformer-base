@@ -57,7 +57,9 @@ function mapValues(obj, transform, thisArg) {
 
   const newObj = { ...obj };
   for (const [propName, propValue] of Object.entries(obj)) {
-    newObj[propName] = transform.call(thisArg, propValue);
+    if (propValue !== undefined) {
+      newObj[propName] = transform.call(thisArg, propValue);
+    }
   }
 
   return newObj;
@@ -486,7 +488,10 @@ class OpenApiTransformerBase {
       // Match using pattern similar to one mentioned in
       // https://github.com/OAI/OpenAPI-Specification/issues/2471#issuecomment-781362295
       if (prop === 'default' || /^[1-5]([0-9][0-9]|XX)$/.test(prop)) {
-        newResponses[prop] = this.transformResponse(responses[prop]);
+        const response = responses[prop];
+        if (response !== undefined) {
+          newResponses[prop] = this.transformResponse(response);
+        }
       }
     }
 
@@ -594,8 +599,9 @@ class OpenApiTransformerBase {
     }
 
     for (const method of PATH_METHODS) {
-      if (hasOwnProperty.call(pathItem, method)) {
-        newPathItem[method] = this.transformOperation(pathItem[method]);
+      const operation = pathItem[method];
+      if (operation !== undefined) {
+        newPathItem[method] = this.transformOperation(operation);
       }
     }
 
