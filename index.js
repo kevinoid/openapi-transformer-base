@@ -6,6 +6,8 @@
 
 'use strict';
 
+const { isArray } = Array;
+
 /** HTTP method names which are properties of a Path Item Object that have
  * Operation Object values.
  *
@@ -48,7 +50,7 @@ function mapValues(obj, transform, thisArg) {
     return obj;
   }
 
-  if (Array.isArray(obj)) {
+  if (isArray(obj)) {
     // Note: This function is only called for values specified as Map[X,Y]
     // in the OpenAPI Specification.  Array values are invalid and it would
     // be unsafe to assume that their contents are type Y.  Return unchanged.
@@ -212,7 +214,7 @@ class OpenApiTransformerBase {
 
     if (items !== undefined) {
       // Note: OpenAPI 3.0 disallows Arrays, 2.0 and 3.1 drafts allow it
-      if (Array.isArray(items)) {
+      if (isArray(items)) {
         newSchema.items = items.map(this.transformSchema, this);
       } else {
         newSchema.items = this.transformSchema(items);
@@ -273,7 +275,7 @@ class OpenApiTransformerBase {
 
     for (const schemaProp of ['allOf', 'anyOf', 'oneOf']) {
       const subSchemas = schema[schemaProp];
-      if (Array.isArray(subSchemas)) {
+      if (isArray(subSchemas)) {
         newSchema[schemaProp] = subSchemas.map(this.transformSchema, this);
       }
     }
@@ -553,7 +555,7 @@ class OpenApiTransformerBase {
         this.transformExternalDocs(operation.externalDocs);
     }
 
-    if (Array.isArray(operation.parameters)) {
+    if (isArray(operation.parameters)) {
       newOperation.parameters =
         operation.parameters.map(this.transformParameter, this);
     }
@@ -572,12 +574,12 @@ class OpenApiTransformerBase {
         mapValues(operation.callbacks, this.transformCallback, this);
     }
 
-    if (Array.isArray(operation.security)) {
+    if (isArray(operation.security)) {
       newOperation.security =
         operation.security.map(this.transformSecurityRequirement, this);
     }
 
-    if (Array.isArray(operation.servers)) {
+    if (isArray(operation.servers)) {
       newOperation.servers = operation.servers.map(this.transformServer, this);
     }
 
@@ -598,7 +600,7 @@ class OpenApiTransformerBase {
 
     const newPathItem = { ...pathItem };
 
-    if (Array.isArray(pathItem.parameters)) {
+    if (isArray(pathItem.parameters)) {
       newPathItem.parameters =
         pathItem.parameters.map(this.transformParameter, this);
     }
@@ -892,7 +894,7 @@ class OpenApiTransformerBase {
       newOpenApi.info = this.transformInfo(openApi.info);
     }
 
-    if (Array.isArray(openApi.servers)) {
+    if (isArray(openApi.servers)) {
       newOpenApi.servers = openApi.servers.map(this.transformServer, this);
     }
 
@@ -919,12 +921,12 @@ class OpenApiTransformerBase {
       newOpenApi.paths = this.transformPaths(openApi.paths);
     }
 
-    if (Array.isArray(openApi.security)) {
+    if (isArray(openApi.security)) {
       newOpenApi.security =
         openApi.security.map(this.transformSecurityRequirement, this);
     }
 
-    if (Array.isArray(openApi.tags)) {
+    if (isArray(openApi.tags)) {
       newOpenApi.tags = openApi.tags.map(this.transformTag, this);
     }
 
