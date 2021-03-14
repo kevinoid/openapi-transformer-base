@@ -941,6 +941,11 @@ class OpenApiTransformerBase {
       newOpenApi.paths = this.transformPaths(openApi.paths);
     }
 
+    if (openApi.webhooks !== undefined) {
+      newOpenApi.webhooks =
+        mapValues(openApi.webhooks, this.transformPathItem, this);
+    }
+
     if (isArray(openApi.security)) {
       newOpenApi.security =
         openApi.security.map(this.transformSecurityRequirement, this);
