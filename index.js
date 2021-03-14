@@ -705,6 +705,11 @@ class OpenApiTransformerBase {
         mapValues(components.callbacks, this.transformCallback, this);
     }
 
+    if (components.pathItems !== undefined) {
+      newComponents.pathItems =
+        mapValues(components.pathItems, this.transformPathItem, this);
+    }
+
     return newComponents;
   }
 
