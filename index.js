@@ -199,8 +199,7 @@ class OpenApiTransformerBase {
     if (items !== undefined) {
       // Note: OpenAPI 3.0 disallows Arrays, 2.0 and 3.1 drafts allow it
       if (Array.isArray(items)) {
-        newSchema.items =
-          mapValues(items, this.transformSchema, this);
+        newSchema.items = items.map(this.transformSchema, this);
       } else {
         newSchema.items = this.transformSchema(items);
       }
@@ -260,9 +259,8 @@ class OpenApiTransformerBase {
 
     for (const schemaProp of ['allOf', 'anyOf', 'oneOf']) {
       const subSchemas = schema[schemaProp];
-      if (subSchemas !== undefined) {
-        newSchema[schemaProp] =
-          mapValues(subSchemas, this.transformSchema, this);
+      if (Array.isArray(subSchemas)) {
+        newSchema[schemaProp] = subSchemas.map(this.transformSchema, this);
       }
     }
 
@@ -538,9 +536,9 @@ class OpenApiTransformerBase {
         this.transformExternalDocs(operation.externalDocs);
     }
 
-    if (operation.parameters !== undefined) {
+    if (Array.isArray(operation.parameters)) {
       newOperation.parameters =
-        mapValues(operation.parameters, this.transformParameter, this);
+        operation.parameters.map(this.transformParameter, this);
     }
 
     if (operation.requestBody && operation.requestBody.content) {
@@ -557,20 +555,13 @@ class OpenApiTransformerBase {
         mapValues(operation.callbacks, this.transformCallback, this);
     }
 
-    if (operation.security !== undefined) {
-      newOperation.security = mapValues(
-        operation.security,
-        this.transformSecurityRequirement,
-        this,
-      );
+    if (Array.isArray(operation.security)) {
+      newOperation.security =
+        operation.security.map(this.transformSecurityRequirement, this);
     }
 
-    if (operation.servers !== undefined) {
-      newOperation.servers = mapValues(
-        operation.servers,
-        this.transformServer,
-        this,
-      );
+    if (Array.isArray(operation.servers)) {
+      newOperation.servers = operation.servers.map(this.transformServer, this);
     }
 
     return newOperation;
@@ -590,9 +581,9 @@ class OpenApiTransformerBase {
 
     const newPathItem = { ...pathItem };
 
-    if (pathItem.parameters !== undefined) {
+    if (Array.isArray(pathItem.parameters)) {
       newPathItem.parameters =
-        mapValues(pathItem.parameters, this.transformParameter, this);
+        pathItem.parameters.map(this.transformParameter, this);
     }
 
     for (const method of PATH_METHODS) {
@@ -883,9 +874,8 @@ class OpenApiTransformerBase {
       newOpenApi.info = this.transformInfo(openApi.info);
     }
 
-    if (openApi.servers !== undefined) {
-      newOpenApi.servers =
-        mapValues(openApi.servers, this.transformServer, this);
+    if (Array.isArray(openApi.servers)) {
+      newOpenApi.servers = openApi.servers.map(this.transformServer, this);
     }
 
     if (openApi.components !== undefined) {
@@ -911,16 +901,13 @@ class OpenApiTransformerBase {
       newOpenApi.paths = this.transformPaths(openApi.paths);
     }
 
-    if (openApi.security !== undefined) {
-      newOpenApi.security = mapValues(
-        openApi.security,
-        this.transformSecurityRequirement,
-        this,
-      );
+    if (Array.isArray(openApi.security)) {
+      newOpenApi.security =
+        openApi.security.map(this.transformSecurityRequirement, this);
     }
 
-    if (openApi.tags !== undefined) {
-      newOpenApi.tags = mapValues(openApi.tags, this.transformTag, this);
+    if (Array.isArray(openApi.tags)) {
+      newOpenApi.tags = openApi.tags.map(this.transformTag, this);
     }
 
     if (openApi.externalDocs !== undefined) {
