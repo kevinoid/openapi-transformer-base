@@ -93,9 +93,14 @@ function mapValues(obj, transform, thisArg) {
  *   made to handle invalid values gracefully.  Child classes should be
  *   prepared for arguments with any type or value if the document may not be
  *   valid.</li>
- * <li>Properties with value <code>undefined</code> are not transformed (since
- *   <code>undefined</code> is not directly representable in JSON, it has no
- *   defined significance in OpenAPI).</li>
+ * <li>Minimal effort is made to handle or preserve values which are not
+ *   representable in JSON (e.g. Date, RegExp, non-Object.prototype, Symbol
+ *   and non-enumerable properties, etc.), which are usually treated as generic
+ *   objects.</li>
+ * <li>One exception to the previous point: transform methods are not called on
+ *   <code>undefined</code> values, which are treated like missing properties
+ *   except that they are copied to the transformed object to preserve the
+ *   object shape.</li>
  * <li>Returned values are added to the transformed object, regardless of value.
  *   Therefore, unless overridden, returned objects will have the same
  *   properties as the original object, some of which may be undefined.</li>
