@@ -393,6 +393,11 @@ class OpenApiTransformerBase {
       newMediaType.schema = this.transformSchema(mediaType.schema);
     }
 
+    if (mediaType.examples !== undefined) {
+      newMediaType.examples =
+        this.transformMap(mediaType.examples, this.transformExample3);
+    }
+
     if (mediaType.encoding !== undefined) {
       newMediaType.encoding =
         this.transformMap(mediaType.encoding, this.transformEncoding);
