@@ -24,6 +24,22 @@ const PATH_METHODS = [
   'trace',
 ];
 
+/** Transforms a value which has type object<string,T> but is not defined as
+ * Map[string,T] in OpenAPI.
+ *
+ * Note: This is currently used for schema properties, where #transformMap()
+ * often complicates transformations due to differences with Map[string,Schema]
+ * on definitions/components.schema and complicates optimizations.
+ *
+ * TODO: If there is a use case, consider adding #transformProperties() or
+ * similar.  (How to handle patternProperties?  dependentSchemas?)
+ *
+ * @private
+ * @function
+ * @borrows OpenApiTransformerBase#transformMap as transformMapLike
+ */
+let transformMapLike;
+
 /** Base class for traversing or transforming OpenAPI 2.x or 3.x documents
  * using a modified visitor design pattern to traverse object types within
  * the OpenAPI document tree.
@@ -229,12 +245,12 @@ class OpenApiTransformerBase {
 
     if (properties !== undefined) {
       newSchema.properties =
-        this.transformMap(properties, this.transformSchema);
+        transformMapLike.call(this, properties, this.transformSchema);
     }
 
     if (patternProperties !== undefined) {
       newSchema.patternProperties =
-        this.transformMap(patternProperties, this.transformSchema);
+        transformMapLike.call(this, patternProperties, this.transformSchema);
     }
 
     if (unevaluatedProperties !== undefined) {
@@ -265,7 +281,7 @@ class OpenApiTransformerBase {
 
     if (dependentSchemas !== undefined) {
       newSchema.dependentSchemas =
-        this.transformMap(dependentSchemas, this.transformSchema);
+        transformMapLike.call(this, dependentSchemas, this.transformSchema);
     }
 
     if (contains !== undefined) {
@@ -971,5 +987,7 @@ class OpenApiTransformerBase {
     return newOpenApi;
   }
 }
+
+transformMapLike = OpenApiTransformerBase.prototype.transformMap;
 
 module.exports = OpenApiTransformerBase;
