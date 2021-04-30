@@ -942,6 +942,9 @@ class OpenApiTransformerBase {
       newOpenApi.servers = openApi.servers.map(this.transformServer, this);
     }
 
+    // Note: Transform components and definitions before properties likely
+    // to have $refs pointing to them (to simplify renaming).
+    // TODO: Guarantee this as part of the API?  Document in JSDoc comment.
     if (openApi.components !== undefined) {
       newOpenApi.components = this.transformComponents(openApi.components);
     }
