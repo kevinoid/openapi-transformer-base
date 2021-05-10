@@ -654,6 +654,9 @@ class OpenApiTransformerBase {
    * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#pathsObject
    * Paths Object}.
    *
+   * Note: Paths Object may be traversed from the x-ms-paths property in
+   * addition to the paths property of the OpenAPI Object.
+   *
    * @param {!object} paths Paths Object.
    * @returns {!object} Transformed Paths Object.
    */
@@ -966,6 +969,11 @@ class OpenApiTransformerBase {
 
     if (openApi.paths !== undefined) {
       newOpenApi.paths = this.transformPaths(openApi.paths);
+    }
+
+    // https://github.com/Azure/autorest/tree/master/docs/extensions#x-ms-paths
+    if (openApi['x-ms-paths'] !== undefined) {
+      newOpenApi['x-ms-paths'] = this.transformPaths(openApi['x-ms-paths']);
     }
 
     if (openApi.webhooks !== undefined) {
