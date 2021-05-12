@@ -945,6 +945,19 @@ class OpenApiTransformerBase {
       newOpenApi.servers = openApi.servers.map(this.transformServer, this);
     }
 
+    // https://github.com/Azure/autorest/blob/master/docs/extensions/readme.md#x-ms-parameterized-host
+    const xMsParameterizedHost = openApi['x-ms-parameterized-host'];
+    if (typeof xMsParameterizedHost === 'object'
+      && xMsParameterizedHost !== null) {
+      const { parameters } = xMsParameterizedHost;
+      if (isArray(parameters)) {
+        newOpenApi['x-ms-parameterized-host'] = {
+          ...xMsParameterizedHost,
+          parameters: parameters.map(this.transformParameter, this),
+        };
+      }
+    }
+
     // Note: Transform components and definitions before properties likely
     // to have $refs pointing to them (to simplify renaming).
     // TODO: Guarantee this as part of the API?  Document in JSDoc comment.
