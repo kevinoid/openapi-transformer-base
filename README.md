@@ -17,7 +17,7 @@ types within the OpenAPI document tree.
 
 This class is used to implement several common OpenAPI document
 transformations in
-[openapi-transformer](https://github.com/kevinoid/openapi-transformer).
+[@kevinoid/openapi-transformers](https://github.com/kevinoid/openapi-transformers).
 
 
 ## Introductory Examples
