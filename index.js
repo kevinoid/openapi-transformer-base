@@ -543,7 +543,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Callback Object.
    */
   transformCallback(callback) {
-    return this.transformMap(callback, this.transformPathItem);
+    return transformMapLike.call(this, callback, this.transformPathItem);
   }
 
   /** Transforms a {@link
