@@ -336,15 +336,21 @@ class OpenApiTransformerBase {
   transformHeader(header) {
     if (typeof header !== 'object'
       || header === null
-      || isArray(header)
-      || header.schema === undefined) {
+      || isArray(header)) {
       return header;
     }
 
-    return {
-      ...header,
-      schema: this.transformSchema(header.schema),
-    };
+    const newHeader = { ...header };
+
+    if (header.items !== undefined) {
+      newHeader.items = this.transformItems(header.items);
+    }
+
+    if (header.schema !== undefined) {
+      newHeader.schema = this.transformSchema(header.schema);
+    }
+
+    return newHeader;
   }
 
   /** Transforms a {@link
