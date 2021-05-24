@@ -661,7 +661,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Paths Object.
    */
   transformPaths(paths) {
-    return this.transformMap(paths, this.transformPathItem);
+    return transformMapLike.call(this, paths, this.transformPathItem);
   }
 
   /** Transforms a {@link
