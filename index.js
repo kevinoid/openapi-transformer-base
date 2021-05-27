@@ -602,7 +602,7 @@ class OpenApiTransformerBase {
         operation.parameters.map(this.transformParameter, this);
     }
 
-    if (operation.requestBody && operation.requestBody.content) {
+    if (operation.requestBody !== undefined) {
       newOperation.requestBody =
         this.transformRequestBody(operation.requestBody);
     }
