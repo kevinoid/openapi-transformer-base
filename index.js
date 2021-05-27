@@ -530,7 +530,10 @@ class OpenApiTransformerBase {
       //
       // Match using pattern similar to one mentioned in
       // https://github.com/OAI/OpenAPI-Specification/issues/2471#issuecomment-781362295
-      if (prop === 'default' || /^[1-5]([0-9][0-9]|XX)$/.test(prop)) {
+      // Be lenient about upper/lowercase, and single x in last 2 positions.
+      // Although lowercase and single x are not valid, the risk of being
+      // anything other than a response object is low enough to justify.
+      if (prop === 'default' || /^[1-5][0-9Xx][0-9Xx]$/.test(prop)) {
         const response = responses[prop];
         if (response !== undefined) {
           newResponses[prop] = this.transformResponse(response);
