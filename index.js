@@ -24,9 +24,6 @@ const httpMethodSet = new Set(METHODS);
  * often complicates transformations due to differences with Map[string,Schema]
  * on definitions/components.schema and complicates optimizations.
  *
- * TODO: If there is a use case, consider adding #transformProperties() or
- * similar.  (How to handle patternProperties?  dependentSchemas?)
- *
  * @private
  * @template T, U
  * @param {!object<string,T>|*} obj Map-like object to transform.
