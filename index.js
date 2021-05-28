@@ -6,6 +6,8 @@
 
 'use strict';
 
+const { METHODS } = require('http');
+
 const { isArray } = Array;
 
 /** HTTP method names which are properties of a Path Item Object that have
@@ -13,16 +15,7 @@ const { isArray } = Array;
  *
  * @private
  */
-const PATH_METHODS = [
-  'delete',
-  'get',
-  'head',
-  'options',
-  'patch',
-  'post',
-  'put',
-  'trace',
-];
+const httpMethodSet = new Set(METHODS);
 
 /** Transforms a value which has type object<string,T> but is not defined as
  * Map[string,T] in OpenAPI.
@@ -653,9 +646,9 @@ class OpenApiTransformerBase {
         pathItem.parameters.map(this.transformParameter, this);
     }
 
-    for (const method of PATH_METHODS) {
+    for (const method of Object.keys(pathItem)) {
       const operation = pathItem[method];
-      if (operation !== undefined) {
+      if (operation !== undefined && httpMethodSet.has(method.toUpperCase())) {
         newPathItem[method] = this.transformOperation(operation);
       }
     }
