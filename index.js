@@ -28,10 +28,34 @@ const httpMethodSet = new Set(METHODS);
  * similar.  (How to handle patternProperties?  dependentSchemas?)
  *
  * @private
- * @function
- * @borrows OpenApiTransformerBase#transformMap as transformMapLike
+ * @template T, U
+ * @param {!object<string,T>|*} obj Map-like object to transform.
+ * @param {function(T): U} transform Method which transforms values in obj.
+ * @returns {!object<string,U>|*} If obj is a Map, a plain object with the
+ * same own enumerable string-keyed properties as obj with values returned
+ * by transform.  Otherwise, obj is returned unchanged.
  */
-let transformMapLike;
+function transformMapLike(obj, transform) {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+
+  if (isArray(obj)) {
+    // Note: This function is only called for values specified as Map[X,Y]
+    // in the OpenAPI Specification.  Array values are invalid and it would
+    // be unsafe to assume that their contents are type Y.  Return unchanged.
+    return obj;
+  }
+
+  const newObj = { ...obj };
+  for (const [propName, propValue] of Object.entries(obj)) {
+    if (propValue !== undefined) {
+      newObj[propName] = transform.call(this, propValue);
+    }
+  }
+
+  return newObj;
+}
 
 /** Base class for traversing or transforming OpenAPI 2.x or 3.x documents
  * using a modified visitor design pattern to traverse object types within
@@ -96,25 +120,7 @@ class OpenApiTransformerBase {
    * by transform.  Otherwise, obj is returned unchanged.
    */
   transformMap(obj, transform) {
-    if (typeof obj !== 'object' || obj === null) {
-      return obj;
-    }
-
-    if (isArray(obj)) {
-      // Note: This function is only called for values specified as Map[X,Y]
-      // in the OpenAPI Specification.  Array values are invalid and it would
-      // be unsafe to assume that their contents are type Y.  Return unchanged.
-      return obj;
-    }
-
-    const newObj = { ...obj };
-    for (const [propName, propValue] of Object.entries(obj)) {
-      if (propValue !== undefined) {
-        newObj[propName] = transform.call(this, propValue);
-      }
-    }
-
-    return newObj;
+    return transformMapLike.call(this, obj, transform);
   }
 
   /** Transforms a {@link
@@ -1017,7 +1023,5 @@ class OpenApiTransformerBase {
     return newOpenApi;
   }
 }
-
-transformMapLike = OpenApiTransformerBase.prototype.transformMap;
 
 module.exports = OpenApiTransformerBase;
