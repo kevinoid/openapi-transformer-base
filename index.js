@@ -644,6 +644,10 @@ class OpenApiTransformerBase {
 
     const newPathItem = { ...pathItem };
 
+    if (isArray(pathItem.servers)) {
+      newPathItem.servers = pathItem.servers.map(this.transformServer, this);
+    }
+
     if (isArray(pathItem.parameters)) {
       newPathItem.parameters =
         pathItem.parameters.map(this.transformParameter, this);
