@@ -31,11 +31,15 @@ const httpMethodSet = new Set(METHODS);
  * @template T, U
  * @param {!object<string,T>|*} obj Map-like object to transform.
  * @param {function(T): U} transform Method which transforms values in obj.
+ * @param {boolean=} skipExtensions If true, do not call transform on {@link
+ * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#specificationExtensions
+ * Specification Extensions} (i.e.  properties starting with "x-").
+ * Such properties are copied to the returned object without transformation.
  * @returns {!object<string,U>|*} If obj is a Map, a plain object with the
  * same own enumerable string-keyed properties as obj with values returned
  * by transform.  Otherwise, obj is returned unchanged.
  */
-function transformMapLike(obj, transform) {
+function transformMapLike(obj, transform, skipExtensions) {
   if (typeof obj !== 'object' || obj === null) {
     return obj;
   }
@@ -49,7 +53,8 @@ function transformMapLike(obj, transform) {
 
   const newObj = { ...obj };
   for (const [propName, propValue] of Object.entries(obj)) {
-    if (propValue !== undefined) {
+    if (propValue !== undefined
+      && (!skipExtensions || !propName.startsWith('x-'))) {
       newObj[propName] = transform.call(this, propValue);
     }
   }
@@ -551,7 +556,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Callback Object.
    */
   transformCallback(callback) {
-    return transformMapLike.call(this, callback, this.transformPathItem);
+    return transformMapLike.call(this, callback, this.transformPathItem, true);
   }
 
   /** Transforms a {@link
@@ -673,7 +678,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Paths Object.
    */
   transformPaths(paths) {
-    return transformMapLike.call(this, paths, this.transformPathItem);
+    return transformMapLike.call(this, paths, this.transformPathItem, true);
   }
 
   /** Transforms a {@link
