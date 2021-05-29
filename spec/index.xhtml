@@ -1,0 +1,3324 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Specifications in Mocha</title>
+  <meta name="generator" content="Mocha &lt;https://mochajs.org/&gt;" />
+  <meta name="license" content="MIT" />
+  <meta name="copyright" content="&#169; 2016 Kevin Locke &lt;kevin@kevinlocke.name&gt;" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/highlight.js/9.1.0/styles/github.min.css" />
+  <style type="text/css">
+section section {
+  margin-left: 1em;
+}
+section section section section {
+  margin-left: 0;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="suite">
+      <h1>OpenApiTransformerBase</h1>
+      <dl>
+        <section class="suite">
+          <h1>#transformCallback()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformPathItem on each value</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const callback = deepFreeze({
+  &#x27;http://example.com&#x27;: {},
+  &#x27;$request.body#/url&#x27;: {},
+});
+assert.deepStrictEqual(t.transformCallback(callback), callback);
+const values = Object.values(callback);
+sinon.assert.calledWith(t.transformPathItem, values[0]);
+sinon.assert.calledWith(t.transformPathItem, values[1]);
+sinon.assert.calledTwice(t.transformPathItem);
+sinon.assert.alwaysCalledOn(t.transformPathItem, t);
+sinon.assert.calledOnce(t.transformCallback);
+assertOnlyCalledMethods(t, [t.transformCallback, t.transformPathItem]);</code></pre></dd>
+            <dt>does not call transformPathItem on x- properties</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const callback = deepFreeze({ &#x27;x-test&#x27;: {} });
+assert.deepStrictEqual(t.transformCallback(callback), callback);
+sinon.assert.calledOnce(t.transformCallback);
+assertOnlyCalledMethods(t, [t.transformCallback]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformComponents()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformMap on schemas</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ schemas: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.schemas,
+  t.transformSchema,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on responses</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ responses: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.responses,
+  t.transformResponse,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on parameters</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ parameters: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.parameters,
+  t.transformParameter,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on examples</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ examples: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.examples,
+  t.transformExample3,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on requestBodies</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ requestBodies: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.requestBodies,
+  t.transformRequestBody,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on headers</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ headers: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.headers,
+  t.transformHeader,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on securitySchemes</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ securitySchemes: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.securitySchemes,
+  t.transformSecurityScheme,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on links</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ links: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.links,
+  t.transformLink,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on callbacks</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ callbacks: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.callbacks,
+  t.transformCallback,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on pathItems</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const components = deepFreeze({ pathItems: {} });
+assert.deepStrictEqual(t.transformComponents(components), components);
+sinon.assert.calledWith(
+  t.transformMap,
+  components.pathItems,
+  t.transformPathItem,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformComponents);
+assertOnlyCalledMethods(t, [t.transformComponents, t.transformMap]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformContact()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformDiscriminator()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformEncoding()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformMap on headers</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const encoding = deepFreeze({ headers: {} });
+assert.deepStrictEqual(t.transformEncoding(encoding), encoding);
+sinon.assert.calledWith(
+  t.transformMap,
+  encoding.headers,
+  t.transformHeader,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformEncoding);
+assertOnlyCalledMethods(t, [t.transformEncoding, t.transformMap]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformExample()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformExample3()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformExternalDocs()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformHeader()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformItems on items</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const header = deepFreeze({ items: {} });
+assert.deepStrictEqual(t.transformHeader(header), header);
+sinon.assert.calledWith(t.transformItems, header.items);
+sinon.assert.calledOnce(t.transformItems);
+sinon.assert.alwaysCalledOn(t.transformItems, t);
+sinon.assert.calledOnce(t.transformHeader);
+assertOnlyCalledMethods(t, [t.transformHeader, t.transformItems]);</code></pre></dd>
+            <dt>calls transformSchema on schema</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const header = deepFreeze({ schema: {} });
+assert.deepStrictEqual(t.transformHeader(header), header);
+sinon.assert.calledWith(t.transformSchema, header.schema);
+sinon.assert.calledOnce(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+sinon.assert.calledOnce(t.transformHeader);
+assertOnlyCalledMethods(t, [t.transformHeader, t.transformSchema]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformInfo()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformContact on contact</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const info = deepFreeze({ contact: {} });
+assert.deepStrictEqual(t.transformInfo(info), info);
+sinon.assert.calledWith(t.transformContact, info.contact);
+sinon.assert.calledOnce(t.transformContact);
+sinon.assert.alwaysCalledOn(t.transformContact, t);
+sinon.assert.calledOnce(t.transformInfo);
+assertOnlyCalledMethods(t, [t.transformInfo, t.transformContact]);</code></pre></dd>
+            <dt>calls transformLicense on license</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const info = deepFreeze({ license: {} });
+assert.deepStrictEqual(t.transformInfo(info), info);
+sinon.assert.calledWith(t.transformLicense, info.license);
+sinon.assert.calledOnce(t.transformLicense);
+sinon.assert.alwaysCalledOn(t.transformLicense, t);
+sinon.assert.calledOnce(t.transformInfo);
+assertOnlyCalledMethods(t, [t.transformInfo, t.transformLicense]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformItems()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformItems recursively on items</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const items = deepFreeze({ items: {} });
+assert.deepStrictEqual(t.transformItems(items), items);
+sinon.assert.calledWith(t.transformItems, items.items);
+sinon.assert.calledTwice(t.transformItems);
+sinon.assert.alwaysCalledOn(t.transformItems, t);
+assertOnlyCalledMethods(t, [t.transformItems]);</code></pre></dd>
+            <dt>does not call transformItems on undefined items</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const items = deepFreeze({ items: undefined });
+assert.deepStrictEqual(t.transformItems(items), items);
+sinon.assert.calledOnce(t.transformItems);
+assertOnlyCalledMethods(t, [t.transformItems]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformLicense()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformLink()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformServer on server</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const link = deepFreeze({ server: {} });
+assert.deepStrictEqual(t.transformLink(link), link);
+sinon.assert.calledWith(t.transformServer, link.server);
+sinon.assert.calledOnce(t.transformServer);
+sinon.assert.alwaysCalledOn(t.transformServer, t);
+sinon.assert.calledOnce(t.transformLink);
+assertOnlyCalledMethods(t, [t.transformLink, t.transformServer]);</code></pre></dd>
+            <dt>does not call transformServer on undefined server</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const link = deepFreeze({ server: undefined });
+assert.deepStrictEqual(t.transformLink(link), link);
+sinon.assert.calledOnce(t.transformLink);
+assertOnlyCalledMethods(t, [t.transformLink]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformMap()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls its second argument on each property</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const mapper = sinon.stub().returns(true);
+const obj = deepFreeze({
+  a: 1,
+  b: 2,
+});
+const t = sinon.spy(new OpenApiTransformerBase());
+assert.deepStrictEqual(t.transformMap(obj, mapper), {
+  a: true,
+  b: true,
+});
+sinon.assert.calledWith(mapper, 1);
+sinon.assert.calledWith(mapper, 2);
+sinon.assert.calledTwice(mapper);
+sinon.assert.alwaysCalledOn(mapper, t);
+sinon.assert.calledOnce(t.transformMap);
+assertOnlyCalledMethods(t, [t.transformMap]);</code></pre></dd>
+            <dt>calls its second argument on x- properties</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const mapper = sinon.stub().returns(true);
+const obj = deepFreeze({ &#x27;x-test&#x27;: 1 });
+const t = sinon.spy(new OpenApiTransformerBase());
+assert.deepStrictEqual(t.transformMap(obj, mapper), { &#x27;x-test&#x27;: true });
+sinon.assert.calledWith(mapper, 1);
+sinon.assert.calledOnce(mapper);
+sinon.assert.alwaysCalledOn(mapper, t);
+sinon.assert.calledOnce(t.transformMap);
+assertOnlyCalledMethods(t, [t.transformMap]);</code></pre></dd>
+            <dt>does not call its second argument on undefined values</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const mapper = sinon.stub().returns(true);
+const obj = deepFreeze({
+  a: 1,
+  b: undefined,
+});
+const t = sinon.spy(new OpenApiTransformerBase());
+assert.deepStrictEqual(t.transformMap(obj, mapper), {
+  a: true,
+  b: undefined,
+});
+sinon.assert.calledWith(mapper, 1);
+sinon.assert.calledOnce(mapper);
+sinon.assert.alwaysCalledOn(mapper, t);
+sinon.assert.calledOnce(t.transformMap);
+assertOnlyCalledMethods(t, [t.transformMap]);</code></pre></dd>
+            <dt>does not map object prototype</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const mapper = sinon.stub().returns(true);
+const obj = Object.create({ a: 1 });
+obj.b = 2;
+deepFreeze(obj);
+const t = sinon.spy(new OpenApiTransformerBase());
+assert.deepStrictEqual(t.transformMap(obj, mapper), { b: true });
+sinon.assert.calledWith(mapper, 2);
+sinon.assert.calledOnce(mapper);
+sinon.assert.alwaysCalledOn(mapper, t);
+sinon.assert.calledOnce(t.transformMap);
+assertOnlyCalledMethods(t, [t.transformMap]);</code></pre></dd>
+            <dt>does not map Array values</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const mapper = sinon.stub().returns(true);
+const obj = deepFreeze([1, 2]);
+const t = sinon.spy(new OpenApiTransformerBase());
+assert.deepStrictEqual(t.transformMap(obj, mapper), obj);
+sinon.assert.notCalled(mapper);
+sinon.assert.calledOnce(t.transformMap);
+assertOnlyCalledMethods(t, [t.transformMap]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformMediaType()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformSchema on schema</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const mediatype = deepFreeze({ schema: {} });
+assert.deepStrictEqual(t.transformMediaType(mediatype), mediatype);
+sinon.assert.calledWith(t.transformSchema, mediatype.schema);
+sinon.assert.calledOnce(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+sinon.assert.calledOnce(t.transformMediaType);
+assertOnlyCalledMethods(t, [t.transformMediaType, t.transformSchema]);</code></pre></dd>
+            <dt>calls transformMap on examples</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const mediatype = deepFreeze({ examples: {} });
+assert.deepStrictEqual(t.transformMediaType(mediatype), mediatype);
+sinon.assert.calledWith(
+  t.transformMap,
+  mediatype.examples,
+  t.transformExample3,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformMediaType);
+assertOnlyCalledMethods(t, [t.transformMediaType, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on encodings</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const mediatype = deepFreeze({ encoding: {} });
+assert.deepStrictEqual(t.transformMediaType(mediatype), mediatype);
+sinon.assert.calledWith(
+  t.transformMap,
+  mediatype.encoding,
+  t.transformEncoding,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformMediaType);
+assertOnlyCalledMethods(t, [t.transformMediaType, t.transformMap]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformOAuthFlow()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformOAuthFlows()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformOAuthFlow on implicit</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const oAuthFlows = deepFreeze({ implicit: {} });
+assert.deepStrictEqual(t.transformOAuthFlows(oAuthFlows), oAuthFlows);
+sinon.assert.calledWith(t.transformOAuthFlow, oAuthFlows.implicit);
+sinon.assert.calledOnce(t.transformOAuthFlow);
+sinon.assert.alwaysCalledOn(t.transformOAuthFlow, t);
+sinon.assert.calledOnce(t.transformOAuthFlows);
+assertOnlyCalledMethods(t, [t.transformOAuthFlows, t.transformOAuthFlow]);</code></pre></dd>
+            <dt>calls transformOAuthFlow on password</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const oAuthFlows = deepFreeze({ password: {} });
+assert.deepStrictEqual(t.transformOAuthFlows(oAuthFlows), oAuthFlows);
+sinon.assert.calledWith(t.transformOAuthFlow, oAuthFlows.password);
+sinon.assert.calledOnce(t.transformOAuthFlow);
+sinon.assert.alwaysCalledOn(t.transformOAuthFlow, t);
+sinon.assert.calledOnce(t.transformOAuthFlows);
+assertOnlyCalledMethods(t, [t.transformOAuthFlows, t.transformOAuthFlow]);</code></pre></dd>
+            <dt>calls transformOAuthFlow on clientCredentials</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const oAuthFlows = deepFreeze({ clientCredentials: {} });
+assert.deepStrictEqual(t.transformOAuthFlows(oAuthFlows), oAuthFlows);
+sinon.assert.calledWith(
+  t.transformOAuthFlow,
+  oAuthFlows.clientCredentials,
+);
+sinon.assert.calledOnce(t.transformOAuthFlow);
+sinon.assert.alwaysCalledOn(t.transformOAuthFlow, t);
+sinon.assert.calledOnce(t.transformOAuthFlows);
+assertOnlyCalledMethods(t, [t.transformOAuthFlows, t.transformOAuthFlow]);</code></pre></dd>
+            <dt>calls transformOAuthFlow on authorizationCode</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const oAuthFlows = deepFreeze({ authorizationCode: {} });
+assert.deepStrictEqual(t.transformOAuthFlows(oAuthFlows), oAuthFlows);
+sinon.assert.calledWith(
+  t.transformOAuthFlow,
+  oAuthFlows.authorizationCode,
+);
+sinon.assert.calledOnce(t.transformOAuthFlow);
+sinon.assert.alwaysCalledOn(t.transformOAuthFlow, t);
+sinon.assert.calledOnce(t.transformOAuthFlows);
+assertOnlyCalledMethods(t, [t.transformOAuthFlows, t.transformOAuthFlow]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformOpenApi()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformInfo on info</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ info: {} });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(t.transformInfo, openApi.info);
+sinon.assert.calledOnce(t.transformInfo);
+sinon.assert.alwaysCalledOn(t.transformInfo, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformInfo]);</code></pre></dd>
+            <dt>calls transformExternalDocs on externalDocs</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ externalDocs: {} });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(t.transformExternalDocs, openApi.externalDocs);
+sinon.assert.calledOnce(t.transformExternalDocs);
+sinon.assert.alwaysCalledOn(t.transformExternalDocs, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformExternalDocs]);</code></pre></dd>
+            <dt>calls transformServer on servers</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ servers: [{}, {}] });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(t.transformServer.getCall(0), openApi.servers[0]);
+sinon.assert.calledWith(t.transformServer.getCall(1), openApi.servers[1]);
+sinon.assert.calledTwice(t.transformServer);
+sinon.assert.alwaysCalledOn(t.transformServer, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformServer]);</code></pre></dd>
+            <dt>calls transformComponents on components</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ components: {} });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(t.transformComponents, openApi.components);
+sinon.assert.calledOnce(t.transformComponents);
+sinon.assert.alwaysCalledOn(t.transformComponents, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformComponents]);</code></pre></dd>
+            <dt>calls transformMap on definitions</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ definitions: {} });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(
+  t.transformMap,
+  openApi.definitions,
+  t.transformSchema,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on parameters</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ parameters: {} });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(
+  t.transformMap,
+  openApi.parameters,
+  t.transformParameter,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformMap]);</code></pre></dd>
+            <dt>calls transformParameter on x-ms-parameterized-host parameters</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const parameters = [{}, {}];
+const openApi = deepFreeze({
+  &#x27;x-ms-parameterized-host&#x27;: {
+    hostTemplate: &#x27;example.{tld}&#x27;,
+    parameters,
+  },
+});
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(t.transformParameter.getCall(0), parameters[0]);
+sinon.assert.calledWith(t.transformParameter.getCall(1), parameters[1]);
+sinon.assert.calledTwice(t.transformParameter);
+sinon.assert.alwaysCalledOn(t.transformParameter, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformParameter]);</code></pre></dd>
+            <dt>calls transformResponse on responses</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ responses: {} });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(
+  t.transformMap,
+  openApi.responses,
+  t.transformResponse,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformMap]);</code></pre></dd>
+            <dt>calls transformPaths on paths</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ paths: {} });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(t.transformPaths, openApi.paths);
+sinon.assert.calledOnce(t.transformPaths);
+sinon.assert.alwaysCalledOn(t.transformPaths, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformPaths]);</code></pre></dd>
+            <dt>calls transformPaths on x-ms-paths</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ &#x27;x-ms-paths&#x27;: {} });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(t.transformPaths, openApi[&#x27;x-ms-paths&#x27;]);
+sinon.assert.calledOnce(t.transformPaths);
+sinon.assert.alwaysCalledOn(t.transformPaths, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformPaths]);</code></pre></dd>
+            <dt>calls transformMap on webhooks</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ webhooks: {} });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(
+  t.transformMap,
+  openApi.webhooks,
+  t.transformPathItem,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformMap]);</code></pre></dd>
+            <dt>calls transformSecurityRequirement on security</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({
+  security: [{}, {}],
+});
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(
+  t.transformSecurityRequirement.getCall(0),
+  openApi.security[0],
+);
+sinon.assert.calledWith(
+  t.transformSecurityRequirement.getCall(1),
+  openApi.security[1],
+);
+sinon.assert.calledTwice(t.transformSecurityRequirement);
+sinon.assert.alwaysCalledOn(t.transformSecurityRequirement, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [
+  t.transformOpenApi,
+  t.transformSecurityRequirement,
+]);</code></pre></dd>
+            <dt>calls transformTag on tags</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const openApi = deepFreeze({ tags: [{}, {}] });
+assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
+sinon.assert.calledWith(t.transformTag.getCall(0), openApi.tags[0]);
+sinon.assert.calledWith(t.transformTag.getCall(1), openApi.tags[1]);
+sinon.assert.calledTwice(t.transformTag);
+sinon.assert.alwaysCalledOn(t.transformTag, t);
+sinon.assert.calledOnce(t.transformOpenApi);
+assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformTag]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformOperation()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformExternalDocs on externalDocs</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = deepFreeze({ externalDocs: {} });
+assert.deepStrictEqual(t.transformOperation(operation), operation);
+sinon.assert.calledWith(t.transformExternalDocs, operation.externalDocs);
+sinon.assert.calledOnce(t.transformExternalDocs);
+sinon.assert.alwaysCalledOn(t.transformExternalDocs, t);
+sinon.assert.calledOnce(t.transformOperation);
+assertOnlyCalledMethods(t, [
+  t.transformOperation,
+  t.transformExternalDocs,
+]);</code></pre></dd>
+            <dt>calls transformParameter on each parameter</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const parameters = [{}, {}];
+const operation = deepFreeze({ parameters });
+assert.deepStrictEqual(t.transformOperation(operation), operation);
+sinon.assert.calledWith(t.transformParameter.getCall(0), parameters[0]);
+sinon.assert.calledWith(t.transformParameter.getCall(1), parameters[1]);
+sinon.assert.calledTwice(t.transformParameter);
+sinon.assert.alwaysCalledOn(t.transformParameter, t);
+sinon.assert.calledOnce(t.transformOperation);
+assertOnlyCalledMethods(t, [t.transformOperation, t.transformParameter]);</code></pre></dd>
+            <dt>calls transformRequestBody on requestBody</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = deepFreeze({ requestBody: {} });
+assert.deepStrictEqual(t.transformOperation(operation), operation);
+sinon.assert.calledWith(t.transformRequestBody, operation.requestBody);
+sinon.assert.calledOnce(t.transformRequestBody);
+sinon.assert.alwaysCalledOn(t.transformRequestBody, t);
+sinon.assert.calledOnce(t.transformOperation);
+assertOnlyCalledMethods(t, [
+  t.transformOperation,
+  t.transformRequestBody,
+]);</code></pre></dd>
+            <dt>calls transformResponses on responses</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = deepFreeze({ responses: {} });
+assert.deepStrictEqual(t.transformOperation(operation), operation);
+sinon.assert.calledWith(t.transformResponses, operation.responses);
+sinon.assert.calledOnce(t.transformResponses);
+sinon.assert.alwaysCalledOn(t.transformResponses, t);
+sinon.assert.calledOnce(t.transformOperation);
+assertOnlyCalledMethods(t, [t.transformOperation, t.transformResponses]);</code></pre></dd>
+            <dt>calls transformMap on callbacks</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = deepFreeze({ callbacks: {} });
+assert.deepStrictEqual(t.transformOperation(operation), operation);
+sinon.assert.calledWith(
+  t.transformMap,
+  operation.callbacks,
+  t.transformCallback,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformOperation);
+assertOnlyCalledMethods(t, [t.transformOperation, t.transformMap]);</code></pre></dd>
+            <dt>calls transformSecurityRequirement on each security</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const security = [{}, {}];
+const operation = deepFreeze({ security });
+assert.deepStrictEqual(t.transformOperation(operation), operation);
+sinon.assert.calledWith(
+  t.transformSecurityRequirement.getCall(0),
+  security[0],
+);
+sinon.assert.calledWith(
+  t.transformSecurityRequirement.getCall(1),
+  security[1],
+);
+sinon.assert.calledTwice(t.transformSecurityRequirement);
+sinon.assert.alwaysCalledOn(t.transformSecurityRequirement, t);
+sinon.assert.calledOnce(t.transformOperation);
+assertOnlyCalledMethods(t, [
+  t.transformOperation,
+  t.transformSecurityRequirement,
+]);</code></pre></dd>
+            <dt>calls transformServer on each server</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const servers = [{}, {}];
+const operation = deepFreeze({ servers });
+assert.deepStrictEqual(t.transformOperation(operation), operation);
+sinon.assert.calledWith(t.transformServer.getCall(0), servers[0]);
+sinon.assert.calledWith(t.transformServer.getCall(1), servers[1]);
+sinon.assert.calledTwice(t.transformServer);
+sinon.assert.alwaysCalledOn(t.transformServer, t);
+sinon.assert.calledOnce(t.transformOperation);
+assertOnlyCalledMethods(t, [t.transformOperation, t.transformServer]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformParameter()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformMap on content</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const parameter = deepFreeze({ content: {} });
+assert.deepStrictEqual(t.transformParameter(parameter), parameter);
+sinon.assert.calledWith(
+  t.transformMap,
+  parameter.content,
+  t.transformMediaType,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformParameter);
+assertOnlyCalledMethods(t, [t.transformParameter, t.transformMap]);</code></pre></dd>
+            <dt>calls transformSchema on schema</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const parameter = deepFreeze({ schema: {} });
+assert.deepStrictEqual(t.transformParameter(parameter), parameter);
+sinon.assert.calledWith(t.transformSchema, parameter.schema);
+sinon.assert.calledOnce(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+sinon.assert.calledOnce(t.transformParameter);
+assertOnlyCalledMethods(t, [t.transformParameter, t.transformSchema]);</code></pre></dd>
+            <dt>calls transformItems on items</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const parameter = deepFreeze({ items: {} });
+assert.deepStrictEqual(t.transformParameter(parameter), parameter);
+sinon.assert.calledWith(t.transformItems, parameter.items);
+sinon.assert.calledOnce(t.transformItems);
+sinon.assert.alwaysCalledOn(t.transformItems, t);
+sinon.assert.calledOnce(t.transformParameter);
+assertOnlyCalledMethods(t, [t.transformParameter, t.transformItems]);</code></pre></dd>
+            <dt>calls transformMap on examples</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const parameter = deepFreeze({ examples: {} });
+assert.deepStrictEqual(t.transformParameter(parameter), parameter);
+sinon.assert.calledWith(
+  t.transformMap,
+  parameter.examples,
+  t.transformExample3,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformParameter);
+assertOnlyCalledMethods(t, [t.transformParameter, t.transformMap]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformPathItem()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformParameter on each parameter</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const parameters = [{}, {}];
+const pathItem = deepFreeze({ parameters });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformParameter.getCall(0), parameters[0]);
+sinon.assert.calledWith(t.transformParameter.getCall(1), parameters[1]);
+sinon.assert.calledTwice(t.transformParameter);
+sinon.assert.alwaysCalledOn(t.transformParameter, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformParameter]);</code></pre></dd>
+            <dt>calls transformServer on each server</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const servers = [{}, {}];
+const pathItem = deepFreeze({ servers });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformServer.getCall(0), servers[0]);
+sinon.assert.calledWith(t.transformServer.getCall(1), servers[1]);
+sinon.assert.calledTwice(t.transformServer);
+sinon.assert.alwaysCalledOn(t.transformServer, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformServer]);</code></pre></dd>
+            <dt>calls transformOperation on delete</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [method]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on DELETE</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [methodUpper]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on get</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [method]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on GET</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [methodUpper]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on head</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [method]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on HEAD</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [methodUpper]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on options</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [method]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on OPTIONS</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [methodUpper]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on patch</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [method]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on PATCH</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [methodUpper]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on post</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [method]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on POST</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [methodUpper]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on put</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [method]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on PUT</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [methodUpper]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on trace</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [method]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>calls transformOperation on TRACE</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const operation = {};
+const pathItem = deepFreeze({ [methodUpper]: operation });
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledWith(t.transformOperation, operation);
+sinon.assert.calledOnce(t.transformOperation);
+sinon.assert.alwaysCalledOn(t.transformOperation, t);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem, t.transformOperation]);</code></pre></dd>
+            <dt>does not call transformOperation on non-method props</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const pathItem = deepFreeze({
+  summary: {},
+  description: {},
+  &#x27;x-get&#x27;: {},
+});
+assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
+sinon.assert.calledOnce(t.transformPathItem);
+assertOnlyCalledMethods(t, [t.transformPathItem]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformPaths()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformPathItem on each value for / props</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const paths = deepFreeze({
+  &#x27;/path1&#x27;: {},
+  &#x27;/path2&#x27;: {},
+});
+assert.deepStrictEqual(t.transformPaths(paths), paths);
+const values = Object.values(paths);
+sinon.assert.calledWith(t.transformPathItem, values[0]);
+sinon.assert.calledWith(t.transformPathItem, values[1]);
+sinon.assert.calledTwice(t.transformPathItem);
+sinon.assert.alwaysCalledOn(t.transformPathItem, t);
+sinon.assert.calledOnce(t.transformPaths);
+assertOnlyCalledMethods(t, [t.transformPaths, t.transformPathItem]);</code></pre></dd>
+            <dt>calls transformPathItem on each value for non-/ props</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const paths = deepFreeze({
+  path1: {},
+  path2: {},
+});
+assert.deepStrictEqual(t.transformPaths(paths), paths);
+const values = Object.values(paths);
+sinon.assert.calledWith(t.transformPathItem, values[0]);
+sinon.assert.calledWith(t.transformPathItem, values[1]);
+sinon.assert.calledTwice(t.transformPathItem);
+sinon.assert.alwaysCalledOn(t.transformPathItem, t);
+sinon.assert.calledOnce(t.transformPaths);
+assertOnlyCalledMethods(t, [t.transformPaths, t.transformPathItem]);</code></pre></dd>
+            <dt>does not call transformPathItem on x- properties</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const paths = deepFreeze({ &#x27;x-test&#x27;: {} });
+assert.deepStrictEqual(t.transformPaths(paths), paths);
+sinon.assert.calledOnce(t.transformPaths);
+assertOnlyCalledMethods(t, [t.transformPaths]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformRequestBody()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformMap on content</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const requestBody = deepFreeze({ content: {} });
+assert.deepStrictEqual(t.transformRequestBody(requestBody), requestBody);
+sinon.assert.calledWith(
+  t.transformMap,
+  requestBody.content,
+  t.transformMediaType,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformRequestBody);
+assertOnlyCalledMethods(t, [t.transformRequestBody, t.transformMap]);</code></pre></dd>
+            <dt>does not call transformMap on undefined content</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const requestBody = deepFreeze({ content: undefined });
+assert.deepStrictEqual(t.transformRequestBody(requestBody), requestBody);
+sinon.assert.calledOnce(t.transformRequestBody);
+assertOnlyCalledMethods(t, [t.transformRequestBody]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformResponse()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformMap on headers</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const response = deepFreeze({ headers: {} });
+assert.deepStrictEqual(t.transformResponse(response), response);
+sinon.assert.calledWith(
+  t.transformMap,
+  response.headers,
+  t.transformHeader,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformResponse);
+assertOnlyCalledMethods(t, [t.transformResponse, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on content</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const response = deepFreeze({ content: {} });
+assert.deepStrictEqual(t.transformResponse(response), response);
+sinon.assert.calledWith(
+  t.transformMap,
+  response.content,
+  t.transformMediaType,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformResponse);
+assertOnlyCalledMethods(t, [t.transformResponse, t.transformMap]);</code></pre></dd>
+            <dt>calls transformMap on links</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const response = deepFreeze({ links: {} });
+assert.deepStrictEqual(t.transformResponse(response), response);
+sinon.assert.calledWith(
+  t.transformMap,
+  response.links,
+  t.transformLink,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformResponse);
+assertOnlyCalledMethods(t, [t.transformResponse, t.transformMap]);</code></pre></dd>
+            <dt>calls transformSchema on schema</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const response = deepFreeze({ schema: {} });
+assert.deepStrictEqual(t.transformResponse(response), response);
+sinon.assert.calledWith(t.transformSchema, response.schema);
+sinon.assert.calledOnce(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+sinon.assert.calledOnce(t.transformResponse);
+assertOnlyCalledMethods(t, [t.transformResponse, t.transformSchema]);</code></pre></dd>
+            <dt>calls transformExample on examples</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const response = deepFreeze({ examples: {} });
+assert.deepStrictEqual(t.transformResponse(response), response);
+sinon.assert.calledWith(t.transformExample, response.examples);
+sinon.assert.calledOnce(t.transformExample);
+sinon.assert.alwaysCalledOn(t.transformExample, t);
+sinon.assert.calledOnce(t.transformResponse);
+assertOnlyCalledMethods(t, [t.transformResponse, t.transformExample]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformResponses()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformResponse on default property</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const responses = deepFreeze({ default: {} });
+assert.deepStrictEqual(t.transformResponses(responses), responses);
+sinon.assert.calledWith(t.transformResponse, responses.default);
+sinon.assert.calledOnce(t.transformResponse);
+sinon.assert.alwaysCalledOn(t.transformResponse, t);
+sinon.assert.calledOnce(t.transformResponses);
+assertOnlyCalledMethods(t, [t.transformResponses, t.transformResponse]);</code></pre></dd>
+            <dt>calls transformResponse on 200 property</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const responses = deepFreeze({ 200: {} });
+assert.deepStrictEqual(t.transformResponses(responses), responses);
+sinon.assert.calledWith(t.transformResponse, responses[200]);
+sinon.assert.calledOnce(t.transformResponse);
+sinon.assert.alwaysCalledOn(t.transformResponse, t);
+sinon.assert.calledOnce(t.transformResponses);
+assertOnlyCalledMethods(t, [t.transformResponses, t.transformResponse]);</code></pre></dd>
+            <dt>calls transformResponse on 2XX property</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const responses = deepFreeze({ &#x27;2XX&#x27;: {} });
+assert.deepStrictEqual(t.transformResponses(responses), responses);
+sinon.assert.calledWith(t.transformResponse, responses[&#x27;2XX&#x27;]);
+sinon.assert.calledOnce(t.transformResponse);
+sinon.assert.alwaysCalledOn(t.transformResponse, t);
+sinon.assert.calledOnce(t.transformResponses);
+assertOnlyCalledMethods(t, [t.transformResponses, t.transformResponse]);</code></pre></dd>
+            <dt>does not call transformResponse on x- property</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const responses = deepFreeze({ &#x27;x-other&#x27;: {} });
+assert.deepStrictEqual(t.transformResponses(responses), responses);
+sinon.assert.notCalled(t.transformResponse);
+sinon.assert.calledOnce(t.transformResponses);
+assertOnlyCalledMethods(t, [t.transformResponses]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformSchema()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformDiscriminator on discriminator</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ discriminator: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformDiscriminator, schema.discriminator);
+sinon.assert.calledOnce(t.transformDiscriminator);
+sinon.assert.alwaysCalledOn(t.transformDiscriminator, t);
+sinon.assert.calledOnce(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema, t.transformDiscriminator]);</code></pre></dd>
+            <dt>calls transformExternalDocs on externalDocs</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ externalDocs: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformExternalDocs, schema.externalDocs);
+sinon.assert.calledOnce(t.transformExternalDocs);
+sinon.assert.alwaysCalledOn(t.transformExternalDocs, t);
+sinon.assert.calledOnce(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema, t.transformExternalDocs]);</code></pre></dd>
+            <dt>calls transformXml on xml</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ xml: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformXml, schema.xml);
+sinon.assert.calledOnce(t.transformXml);
+sinon.assert.alwaysCalledOn(t.transformXml, t);
+sinon.assert.calledOnce(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema, t.transformXml]);</code></pre></dd>
+            <dt>calls transformSchema on non-Array items</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ items: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema.items);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on each Array items element</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const items = [{}, {}];
+const schema = deepFreeze({ items });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema.getCall(1), items[0]);
+sinon.assert.calledWith(t.transformSchema.getCall(2), items[1]);
+sinon.assert.callCount(t.transformSchema, 3);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on additionalItems</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on additionalProperties</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on contains</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on else</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on if</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on not</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on propertyNames</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on then</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on unevaluatedItems</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on unevaluatedProperties</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaProp]: {} });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema, schema[schemaProp]);
+sinon.assert.calledTwice(t.transformSchema);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on each value of dependentSchemas</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({
+  [schemaMapProp]: {
+    a: {},
+    b: {},
+  },
+});
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+const values = Object.values(schema[schemaMapProp]);
+sinon.assert.calledWith(t.transformSchema, values[0]);
+sinon.assert.calledWith(t.transformSchema, values[1]);
+sinon.assert.callCount(t.transformSchema, 3);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on x- dependentSchemas</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaMapProp]: { &#x27;x-test&#x27;: {} } });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(
+  t.transformSchema,
+  schema[schemaMapProp][&#x27;x-test&#x27;],
+);
+sinon.assert.calledTwice(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on each value of patternProperties</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({
+  [schemaMapProp]: {
+    a: {},
+    b: {},
+  },
+});
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+const values = Object.values(schema[schemaMapProp]);
+sinon.assert.calledWith(t.transformSchema, values[0]);
+sinon.assert.calledWith(t.transformSchema, values[1]);
+sinon.assert.callCount(t.transformSchema, 3);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on x- patternProperties</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaMapProp]: { &#x27;x-test&#x27;: {} } });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(
+  t.transformSchema,
+  schema[schemaMapProp][&#x27;x-test&#x27;],
+);
+sinon.assert.calledTwice(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on each value of properties</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({
+  [schemaMapProp]: {
+    a: {},
+    b: {},
+  },
+});
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+const values = Object.values(schema[schemaMapProp]);
+sinon.assert.calledWith(t.transformSchema, values[0]);
+sinon.assert.calledWith(t.transformSchema, values[1]);
+sinon.assert.callCount(t.transformSchema, 3);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on x- properties</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaMapProp]: { &#x27;x-test&#x27;: {} } });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(
+  t.transformSchema,
+  schema[schemaMapProp][&#x27;x-test&#x27;],
+);
+sinon.assert.calledTwice(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on each value of allOf</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schemas = [{}, {}];
+const schema = deepFreeze({ [schemaArrayProp]: schemas });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema.getCall(1), schemas[0]);
+sinon.assert.calledWith(t.transformSchema.getCall(2), schemas[1]);
+sinon.assert.callCount(t.transformSchema, 3);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>does not transformSchema on non-Array allOf</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaArrayProp]: { a: {} } });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledOnce(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on each value of anyOf</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schemas = [{}, {}];
+const schema = deepFreeze({ [schemaArrayProp]: schemas });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema.getCall(1), schemas[0]);
+sinon.assert.calledWith(t.transformSchema.getCall(2), schemas[1]);
+sinon.assert.callCount(t.transformSchema, 3);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>does not transformSchema on non-Array anyOf</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaArrayProp]: { a: {} } });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledOnce(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>calls transformSchema on each value of oneOf</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schemas = [{}, {}];
+const schema = deepFreeze({ [schemaArrayProp]: schemas });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledWith(t.transformSchema.getCall(1), schemas[0]);
+sinon.assert.calledWith(t.transformSchema.getCall(2), schemas[1]);
+sinon.assert.callCount(t.transformSchema, 3);
+sinon.assert.alwaysCalledOn(t.transformSchema, t);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>does not transformSchema on non-Array oneOf</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ [schemaArrayProp]: { a: {} } });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledOnce(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+            <dt>does not transform examples</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const schema = deepFreeze({ examples: [{}] });
+assert.deepStrictEqual(t.transformSchema(schema), schema);
+sinon.assert.calledOnce(t.transformSchema);
+assertOnlyCalledMethods(t, [t.transformSchema]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformSecurityRequirement()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformSecurityScheme()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformOAuthFlows on flows</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const securityScheme = deepFreeze({ flows: {} });
+assert.deepStrictEqual(
+  t.transformSecurityScheme(securityScheme),
+  securityScheme,
+);
+sinon.assert.calledWith(t.transformOAuthFlows, securityScheme.flows);
+sinon.assert.calledOnce(t.transformOAuthFlows);
+sinon.assert.alwaysCalledOn(t.transformOAuthFlows, t);
+sinon.assert.calledOnce(t.transformSecurityScheme);
+assertOnlyCalledMethods(t, [
+  t.transformSecurityScheme,
+  t.transformOAuthFlows,
+]);</code></pre></dd>
+            <dt>does not call transformOAuthFlows on undefined flows</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const securityScheme = deepFreeze({ flows: undefined });
+assert.deepStrictEqual(
+  t.transformSecurityScheme(securityScheme),
+  securityScheme,
+);
+sinon.assert.calledOnce(t.transformSecurityScheme);
+assertOnlyCalledMethods(t, [t.transformSecurityScheme]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformServer()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformMap on variables</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const server = deepFreeze({ variables: {} });
+assert.deepStrictEqual(t.transformServer(server), server);
+sinon.assert.calledWith(
+  t.transformMap,
+  server.variables,
+  t.transformServerVariable,
+);
+sinon.assert.calledOnce(t.transformMap);
+sinon.assert.alwaysCalledOn(t.transformMap, t);
+sinon.assert.calledOnce(t.transformServer);
+assertOnlyCalledMethods(t, [t.transformServer, t.transformMap]);</code></pre></dd>
+            <dt>does not call transformServerVariables on undefined variables</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const server = deepFreeze({ variables: undefined });
+assert.deepStrictEqual(t.transformServer(server), server);
+sinon.assert.calledOnce(t.transformServer);
+assertOnlyCalledMethods(t, [t.transformServer]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformServerVariable()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformTag()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+            <dt>calls transformExternalDocs on externalDocs</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const tag = deepFreeze({ externalDocs: {} });
+assert.deepStrictEqual(t.transformTag(tag), tag);
+sinon.assert.calledWith(t.transformExternalDocs, tag.externalDocs);
+sinon.assert.calledOnce(t.transformExternalDocs);
+sinon.assert.alwaysCalledOn(t.transformExternalDocs, t);
+sinon.assert.calledOnce(t.transformTag);
+assertOnlyCalledMethods(t, [t.transformTag, t.transformExternalDocs]);</code></pre></dd>
+            <dt>does not call transformExternalDocs on undefined externalDocs</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const t = sinon.spy(new OpenApiTransformerBase());
+const tag = deepFreeze({ externalDocs: undefined });
+assert.deepStrictEqual(t.transformTag(tag), tag);
+sinon.assert.calledOnce(t.transformTag);
+assertOnlyCalledMethods(t, [t.transformTag]);</code></pre></dd>
+          </dl>
+        </section>
+        <section class="suite">
+          <h1>#transformXml()</h1>
+          <dl>
+            <dt>transforms undefined to undefined</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms null to null</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms false to false</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms true to true</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 0 to 0</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms 1 to 1</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;&#x27; to &#x27;&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms &#x27;x&#x27; to &#x27;x&#x27;</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName](arg);
+assert.strictEqual(result, arg);</code></pre></dd>
+            <dt>transforms [] to []</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]([]);
+assert(Array.isArray(result), &#x27;result isArray&#x27;);
+assert.strictEqual(result.length, 0);</code></pre></dd>
+            <dt>transforms {} to {}</dt>
+            <dt>/home/kevin/src/node-projects/openapi-transformer-base/test/index.js</dt>
+            <dd><pre><code>const transformer = new OpenApiTransformerBase();
+const result = transformer[methodName]({});
+assert.strictEqual(typeof result, &#x27;object&#x27;);
+assert.notStrictEqual(result, null);</code></pre></dd>
+          </dl>
+        </section>
+      </dl>
+    </section>
+  </div><!-- .container -->
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/2.2.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/highlight.js/9.1.0/highlight.min.js"></script>
+  <script type="text/javascript">//<![CDATA[
+'use strict';
+// Adjust the nested heading level to match depth
+$('section section h1').each(function() {
+  var $this = $(this);
+  var depth = Math.min($this.parents('section').length, 6);
+  // http://stackoverflow.com/a/30059450/503410
+  $this.wrapInner(document.createElement('h' + depth)).children().unwrap();
+});
+
+// Make the tests collapsible
+var testNum = 0;
+$('dt + dd')
+  .addClass('collapse')
+  .attr('role', 'tabpanel')
+  .attr('aria-expanded', 'false')
+  .each(function() {
+    var $this = $(this);
+    var $dt = $this.prev();
+
+    ++testNum;
+    var id = 'test' + testNum;
+    var idDt = id + '-title';
+    var idDd = id + '-desc';
+
+    $dt.attr('id', idDt);
+    $this.attr('id', idDd);
+
+    $dt.wrapInner('<a role="button" data-toggle="collapse" href="#' + idDd +
+        '" aria-expanded="false" aria-controls="' + idDd + '"></a>')
+      .children()
+      .collapse();
+  });
+
+// Enable syntax highlighting for the code (which is all JavaScript)
+hljs.configure({languages: ['javascript']});
+hljs.initHighlighting();
+//]]></script>
+</body>
+</html>
