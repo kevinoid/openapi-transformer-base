@@ -39,6 +39,12 @@ function visit(transformer, method, propName, ...args) {
     return method.apply(transformer, args);
   } catch (err) {
     handlingException = true;
+    if (err instanceof Error && !hasOwnProperty.call(err, 'transformPath')) {
+      err.transformPath = [...transformer.transformPath];
+      err.message +=
+        ` (while transforming /${err.transformPath.join('/')})`;
+    }
+
     throw err;
   } finally {
     const popProp = transformer.transformPath.pop();
