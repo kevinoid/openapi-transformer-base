@@ -1334,7 +1334,7 @@ describe('OpenApiTransformerBase', () => {
       'anyOf',
       'oneOf',
     ]) {
-      it(`calls transformArray on value of ${schemaArrayProp}`, () => {
+      it(`calls transformArray on Array ${schemaArrayProp}`, () => {
         const t = sinon.spy(new OpenApiTransformerBase());
         const schemas = [];
         const schema = deepFreeze({ [schemaArrayProp]: schemas });
@@ -1346,9 +1346,21 @@ describe('OpenApiTransformerBase', () => {
         assertOnlyCalledMethods(t, [t.transformSchema, t.transformArray]);
       });
 
-      it(`does not transformSchema on non-Array ${schemaArrayProp}`, () => {
+      it(`calls transformArray on non-Array ${schemaArrayProp}`, () => {
         const t = sinon.spy(new OpenApiTransformerBase());
-        const schema = deepFreeze({ [schemaArrayProp]: { a: {} } });
+        const schemas = {};
+        const schema = deepFreeze({ [schemaArrayProp]: schemas });
+        assert.deepStrictEqual(t.transformSchema(schema), schema);
+        sinon.assert.calledWith(t.transformArray, schemas, t.transformSchema);
+        sinon.assert.calledOnce(t.transformArray);
+        sinon.assert.alwaysCalledOn(t.transformArray, t);
+        sinon.assert.calledOnce(t.transformSchema);
+        assertOnlyCalledMethods(t, [t.transformSchema, t.transformArray]);
+      });
+
+      it(`does not transformSchema on undefined ${schemaArrayProp}`, () => {
+        const t = sinon.spy(new OpenApiTransformerBase());
+        const schema = deepFreeze({ [schemaArrayProp]: undefined });
         assert.deepStrictEqual(t.transformSchema(schema), schema);
         sinon.assert.calledOnce(t.transformSchema);
         assertOnlyCalledMethods(t, [t.transformSchema]);

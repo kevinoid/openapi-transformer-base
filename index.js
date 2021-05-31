@@ -356,7 +356,7 @@ class OpenApiTransformerBase {
 
     for (const schemaProp of ['allOf', 'anyOf', 'oneOf']) {
       const subSchemas = schema[schemaProp];
-      if (isArray(subSchemas)) {
+      if (subSchemas !== undefined) {
         newSchema[schemaProp] =
           this.transformArray(subSchemas, this.transformSchema);
       }
@@ -750,7 +750,7 @@ class OpenApiTransformerBase {
       );
     }
 
-    if (isArray(operation.parameters)) {
+    if (operation.parameters !== undefined) {
       newOperation.parameters =
         this.transformArray(operation.parameters, this.transformParameter);
     }
@@ -783,14 +783,14 @@ class OpenApiTransformerBase {
       );
     }
 
-    if (isArray(operation.security)) {
+    if (operation.security !== undefined) {
       newOperation.security = this.transformArray(
         operation.security,
         this.transformSecurityRequirement,
       );
     }
 
-    if (isArray(operation.servers)) {
+    if (operation.servers !== undefined) {
       newOperation.servers =
         this.transformArray(operation.servers, this.transformServer);
     }
@@ -814,12 +814,12 @@ class OpenApiTransformerBase {
 
     const newPathItem = { ...pathItem };
 
-    if (isArray(pathItem.servers)) {
+    if (pathItem.servers !== undefined) {
       newPathItem.servers =
         this.transformArray(pathItem.servers, this.transformServer);
     }
 
-    if (isArray(pathItem.parameters)) {
+    if (pathItem.parameters !== undefined) {
       newPathItem.parameters =
         this.transformArray(pathItem.parameters, this.transformParameter);
     }
@@ -1221,7 +1221,7 @@ class OpenApiTransformerBase {
       newOpenApi.info = visit(this, this.transformInfo, 'info', openApi.info);
     }
 
-    if (isArray(openApi.servers)) {
+    if (openApi.servers !== undefined) {
       newOpenApi.servers =
         this.transformArray(openApi.servers, this.transformServer);
     }
@@ -1231,7 +1231,7 @@ class OpenApiTransformerBase {
     if (typeof xMsParameterizedHost === 'object'
       && xMsParameterizedHost !== null) {
       const { parameters } = xMsParameterizedHost;
-      if (isArray(parameters)) {
+      if (parameters !== undefined) {
         newOpenApi['x-ms-parameterized-host'] = {
           ...xMsParameterizedHost,
           parameters: this.transformArray(parameters, this.transformParameter),
@@ -1310,14 +1310,14 @@ class OpenApiTransformerBase {
       );
     }
 
-    if (isArray(openApi.security)) {
+    if (openApi.security !== undefined) {
       newOpenApi.security = this.transformArray(
         openApi.security,
         this.transformSecurityRequirement,
       );
     }
 
-    if (isArray(openApi.tags)) {
+    if (openApi.tags !== undefined) {
       newOpenApi.tags = this.transformArray(openApi.tags, this.transformTag);
     }
 
