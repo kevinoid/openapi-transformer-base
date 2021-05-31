@@ -27,7 +27,8 @@
   "main": "index.js",
   "exports": {
     ".": "./index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./visit.js": "./visit.js"
   },
   "//": "All scripts should run in POSIX sh and Windows cmd.exe",
   "scripts": {

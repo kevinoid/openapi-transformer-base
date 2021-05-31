@@ -6,8 +6,8 @@
 
 'use strict';
 
-const assert = require('assert');
 const { METHODS } = require('http');
+const visit = require('./visit.js');
 
 const { isArray } = Array;
 
@@ -17,44 +17,6 @@ const { isArray } = Array;
  * @private
  */
 const httpMethodSet = new Set(METHODS);
-
-/** Visits a property by adding its name to transformPath while calling a
- * given method with a given value.
- *
- * @private
- * @template ArgsType, TransformedType
- * @param {!OpenApiTransformerBase} transformer Transformer on which
- * transformPath will be modified.
- * @param {function(this:!OpenApiTransformerBase, ...ArgsType):
- * TransformedType} method Method to be called.
- * @param {string} propName Name of property being visited.
- * @param {ArgsType} args Argument to method (usually property value).
- * @returns {TransformedType} Result of calling method on args.
- */
-function visit(transformer, method, propName, ...args) {
-  transformer.transformPath.push(propName);
-
-  let handlingException = false;
-  try {
-    return method.apply(transformer, args);
-  } catch (err) {
-    handlingException = true;
-    if (err instanceof Error && !hasOwnProperty.call(err, 'transformPath')) {
-      err.transformPath = [...transformer.transformPath];
-      err.message +=
-        ` (while transforming /${err.transformPath.join('/')})`;
-    }
-
-    throw err;
-  } finally {
-    const popProp = transformer.transformPath.pop();
-
-    // Avoid clobbering an exception which is already propagating
-    if (!handlingException) {
-      assert.strictEqual(popProp, propName);
-    }
-  }
-}
 
 /** Transforms a value which has type object<string,ValueType> but is not
  * defined as Map[string,ValueType] in OpenAPI.
