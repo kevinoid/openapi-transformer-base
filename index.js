@@ -26,8 +26,10 @@ const httpMethodSet = new Set(METHODS);
  *
  * @private
  * @template T, U
+ * @this {!OpenApiTransformerBase}
  * @param {!object<string,T>|*} obj Map-like object to transform.
- * @param {function(T): U} transform Method which transforms values in obj.
+ * @param {function(this:!OpenApiTransformerBase, T): U} transform Method which
+ * transforms values in obj.
  * @param {boolean=} skipExtensions If true, do not call transform on {@link
  * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#specificationExtensions
  * Specification Extensions} (i.e.  properties starting with "x-").
@@ -116,7 +118,8 @@ class OpenApiTransformerBase {
    *
    * @template T, U
    * @param {!object<string,T>|*} obj Map to transform.
-   * @param {function(T): U} transform Method which transforms values in obj.
+   * @param {function(this:!OpenApiTransformerBase, T): U} transform Method
+   * which transforms values in obj.
    * @returns {!object<string,U>|*} If obj is a Map, a plain object with the
    * same own enumerable string-keyed properties as obj with values returned
    * by transform.  Otherwise, obj is returned unchanged.
