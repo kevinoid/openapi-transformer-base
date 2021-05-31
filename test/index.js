@@ -618,16 +618,19 @@ describe('OpenApiTransformerBase', () => {
       assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformExternalDocs]);
     });
 
-    it('calls transformServer on servers', () => {
+    it('calls transformArray on servers', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const openApi = deepFreeze({ servers: [{}, {}] });
+      const openApi = deepFreeze({ servers: [] });
       assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
-      sinon.assert.calledWith(t.transformServer.getCall(0), openApi.servers[0]);
-      sinon.assert.calledWith(t.transformServer.getCall(1), openApi.servers[1]);
-      sinon.assert.calledTwice(t.transformServer);
-      sinon.assert.alwaysCalledOn(t.transformServer, t);
+      sinon.assert.calledWith(
+        t.transformArray,
+        openApi.servers,
+        t.transformServer,
+      );
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
       sinon.assert.calledOnce(t.transformOpenApi);
-      assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformServer]);
+      assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformArray]);
     });
 
     it('calls transformComponents on components', () => {
@@ -671,9 +674,9 @@ describe('OpenApiTransformerBase', () => {
       assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformMap]);
     });
 
-    it('calls transformParameter on x-ms-parameterized-host parameters', () => {
+    it('calls transformArray on x-ms-parameterized-host parameters', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const parameters = [{}, {}];
+      const parameters = [];
       const openApi = deepFreeze({
         'x-ms-parameterized-host': {
           hostTemplate: 'example.{tld}',
@@ -681,12 +684,15 @@ describe('OpenApiTransformerBase', () => {
         },
       });
       assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
-      sinon.assert.calledWith(t.transformParameter.getCall(0), parameters[0]);
-      sinon.assert.calledWith(t.transformParameter.getCall(1), parameters[1]);
-      sinon.assert.calledTwice(t.transformParameter);
-      sinon.assert.alwaysCalledOn(t.transformParameter, t);
+      sinon.assert.calledWith(
+        t.transformArray,
+        parameters,
+        t.transformParameter,
+      );
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
       sinon.assert.calledOnce(t.transformOpenApi);
-      assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformParameter]);
+      assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformArray]);
     });
 
     it('calls transformResponse on responses', () => {
@@ -742,39 +748,34 @@ describe('OpenApiTransformerBase', () => {
       assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformMap]);
     });
 
-    it('calls transformSecurityRequirement on security', () => {
+    it('calls transformArray on security', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const openApi = deepFreeze({
-        security: [{}, {}],
-      });
+      const openApi = deepFreeze({ security: [] });
       assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
       sinon.assert.calledWith(
-        t.transformSecurityRequirement.getCall(0),
-        openApi.security[0],
-      );
-      sinon.assert.calledWith(
-        t.transformSecurityRequirement.getCall(1),
-        openApi.security[1],
-      );
-      sinon.assert.calledTwice(t.transformSecurityRequirement);
-      sinon.assert.alwaysCalledOn(t.transformSecurityRequirement, t);
-      sinon.assert.calledOnce(t.transformOpenApi);
-      assertOnlyCalledMethods(t, [
-        t.transformOpenApi,
+        t.transformArray,
+        openApi.security,
         t.transformSecurityRequirement,
-      ]);
+      );
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
+      sinon.assert.calledOnce(t.transformOpenApi);
+      assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformArray]);
     });
 
-    it('calls transformTag on tags', () => {
+    it('calls transformArray on tags', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const openApi = deepFreeze({ tags: [{}, {}] });
+      const openApi = deepFreeze({ tags: [] });
       assert.deepStrictEqual(t.transformOpenApi(openApi), openApi);
-      sinon.assert.calledWith(t.transformTag.getCall(0), openApi.tags[0]);
-      sinon.assert.calledWith(t.transformTag.getCall(1), openApi.tags[1]);
-      sinon.assert.calledTwice(t.transformTag);
-      sinon.assert.alwaysCalledOn(t.transformTag, t);
+      sinon.assert.calledWith(
+        t.transformArray,
+        openApi.tags,
+        t.transformTag,
+      );
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
       sinon.assert.calledOnce(t.transformOpenApi);
-      assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformTag]);
+      assertOnlyCalledMethods(t, [t.transformOpenApi, t.transformArray]);
     });
   });
 
@@ -795,17 +796,20 @@ describe('OpenApiTransformerBase', () => {
       ]);
     });
 
-    it('calls transformParameter on each parameter', () => {
+    it('calls transformArray on parameters', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const parameters = [{}, {}];
+      const parameters = [];
       const operation = deepFreeze({ parameters });
       assert.deepStrictEqual(t.transformOperation(operation), operation);
-      sinon.assert.calledWith(t.transformParameter.getCall(0), parameters[0]);
-      sinon.assert.calledWith(t.transformParameter.getCall(1), parameters[1]);
-      sinon.assert.calledTwice(t.transformParameter);
-      sinon.assert.alwaysCalledOn(t.transformParameter, t);
+      sinon.assert.calledWith(
+        t.transformArray,
+        parameters,
+        t.transformParameter,
+      );
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
       sinon.assert.calledOnce(t.transformOperation);
-      assertOnlyCalledMethods(t, [t.transformOperation, t.transformParameter]);
+      assertOnlyCalledMethods(t, [t.transformOperation, t.transformArray]);
     });
 
     it('calls transformRequestBody on requestBody', () => {
@@ -848,39 +852,32 @@ describe('OpenApiTransformerBase', () => {
       assertOnlyCalledMethods(t, [t.transformOperation, t.transformMap]);
     });
 
-    it('calls transformSecurityRequirement on each security', () => {
+    it('calls transformArray on security', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const security = [{}, {}];
+      const security = [];
       const operation = deepFreeze({ security });
       assert.deepStrictEqual(t.transformOperation(operation), operation);
       sinon.assert.calledWith(
-        t.transformSecurityRequirement.getCall(0),
-        security[0],
-      );
-      sinon.assert.calledWith(
-        t.transformSecurityRequirement.getCall(1),
-        security[1],
-      );
-      sinon.assert.calledTwice(t.transformSecurityRequirement);
-      sinon.assert.alwaysCalledOn(t.transformSecurityRequirement, t);
-      sinon.assert.calledOnce(t.transformOperation);
-      assertOnlyCalledMethods(t, [
-        t.transformOperation,
+        t.transformArray,
+        security,
         t.transformSecurityRequirement,
-      ]);
+      );
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
+      sinon.assert.calledOnce(t.transformOperation);
+      assertOnlyCalledMethods(t, [t.transformOperation, t.transformArray]);
     });
 
-    it('calls transformServer on each server', () => {
+    it('calls transformArray on servers', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const servers = [{}, {}];
+      const servers = [];
       const operation = deepFreeze({ servers });
       assert.deepStrictEqual(t.transformOperation(operation), operation);
-      sinon.assert.calledWith(t.transformServer.getCall(0), servers[0]);
-      sinon.assert.calledWith(t.transformServer.getCall(1), servers[1]);
-      sinon.assert.calledTwice(t.transformServer);
-      sinon.assert.alwaysCalledOn(t.transformServer, t);
+      sinon.assert.calledWith(t.transformArray, servers, t.transformServer);
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
       sinon.assert.calledOnce(t.transformOperation);
-      assertOnlyCalledMethods(t, [t.transformOperation, t.transformServer]);
+      assertOnlyCalledMethods(t, [t.transformOperation, t.transformArray]);
     });
   });
 
@@ -943,30 +940,32 @@ describe('OpenApiTransformerBase', () => {
   describe('#transformPathItem()', () => {
     methodPreservesArgumentType('transformPathItem');
 
-    it('calls transformParameter on each parameter', () => {
+    it('calls transformArray on parameters', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const parameters = [{}, {}];
+      const parameters = [];
       const pathItem = deepFreeze({ parameters });
       assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
-      sinon.assert.calledWith(t.transformParameter.getCall(0), parameters[0]);
-      sinon.assert.calledWith(t.transformParameter.getCall(1), parameters[1]);
-      sinon.assert.calledTwice(t.transformParameter);
-      sinon.assert.alwaysCalledOn(t.transformParameter, t);
+      sinon.assert.calledWith(
+        t.transformArray,
+        parameters,
+        t.transformParameter,
+      );
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
       sinon.assert.calledOnce(t.transformPathItem);
-      assertOnlyCalledMethods(t, [t.transformPathItem, t.transformParameter]);
+      assertOnlyCalledMethods(t, [t.transformPathItem, t.transformArray]);
     });
 
-    it('calls transformServer on each server', () => {
+    it('calls transformArray on servers', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const servers = [{}, {}];
+      const servers = [];
       const pathItem = deepFreeze({ servers });
       assert.deepStrictEqual(t.transformPathItem(pathItem), pathItem);
-      sinon.assert.calledWith(t.transformServer.getCall(0), servers[0]);
-      sinon.assert.calledWith(t.transformServer.getCall(1), servers[1]);
-      sinon.assert.calledTwice(t.transformServer);
-      sinon.assert.alwaysCalledOn(t.transformServer, t);
+      sinon.assert.calledWith(t.transformArray, servers, t.transformServer);
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
       sinon.assert.calledOnce(t.transformPathItem);
-      assertOnlyCalledMethods(t, [t.transformPathItem, t.transformServer]);
+      assertOnlyCalledMethods(t, [t.transformPathItem, t.transformArray]);
     });
 
     for (const method of [
@@ -1259,16 +1258,16 @@ describe('OpenApiTransformerBase', () => {
     });
 
     // For OAS 2 and OAS 3.1, which allow Array for tuple schema
-    it('calls transformSchema on each Array items element', () => {
+    it('calls transformArray on Array items element', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
-      const items = [{}, {}];
+      const items = [];
       const schema = deepFreeze({ items });
       assert.deepStrictEqual(t.transformSchema(schema), schema);
-      sinon.assert.calledWith(t.transformSchema.getCall(1), items[0]);
-      sinon.assert.calledWith(t.transformSchema.getCall(2), items[1]);
-      sinon.assert.callCount(t.transformSchema, 3);
-      sinon.assert.alwaysCalledOn(t.transformSchema, t);
-      assertOnlyCalledMethods(t, [t.transformSchema]);
+      sinon.assert.calledWith(t.transformArray, items, t.transformSchema);
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.alwaysCalledOn(t.transformArray, t);
+      sinon.assert.calledOnce(t.transformSchema);
+      assertOnlyCalledMethods(t, [t.transformSchema, t.transformArray]);
     });
 
     for (const schemaProp of [
@@ -1335,16 +1334,16 @@ describe('OpenApiTransformerBase', () => {
       'anyOf',
       'oneOf',
     ]) {
-      it(`calls transformSchema on each value of ${schemaArrayProp}`, () => {
+      it(`calls transformArray on value of ${schemaArrayProp}`, () => {
         const t = sinon.spy(new OpenApiTransformerBase());
-        const schemas = [{}, {}];
+        const schemas = [];
         const schema = deepFreeze({ [schemaArrayProp]: schemas });
         assert.deepStrictEqual(t.transformSchema(schema), schema);
-        sinon.assert.calledWith(t.transformSchema.getCall(1), schemas[0]);
-        sinon.assert.calledWith(t.transformSchema.getCall(2), schemas[1]);
-        sinon.assert.callCount(t.transformSchema, 3);
-        sinon.assert.alwaysCalledOn(t.transformSchema, t);
-        assertOnlyCalledMethods(t, [t.transformSchema]);
+        sinon.assert.calledWith(t.transformArray, schemas, t.transformSchema);
+        sinon.assert.calledOnce(t.transformArray);
+        sinon.assert.alwaysCalledOn(t.transformArray, t);
+        sinon.assert.calledOnce(t.transformSchema);
+        assertOnlyCalledMethods(t, [t.transformSchema, t.transformArray]);
       });
 
       it(`does not transformSchema on non-Array ${schemaArrayProp}`, () => {

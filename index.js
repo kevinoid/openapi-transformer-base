@@ -103,6 +103,24 @@ function transformMapLike(obj, transform, skipExtensions) {
  * </ul>
  */
 class OpenApiTransformerBase {
+  /** Transforms an <code>Array[ValueType]</code> using a given transform
+   * method.
+   *
+   * @template ValueType, TransformedType
+   * @param {!Array<ValueType>|*} arr Array to transform.
+   * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
+   * } transform Method which transforms values in arr.
+   * @returns {!Array<TransformedType>|*} If arr is an Array, the result of
+   * Array#map(transform).  Otherwise, obj is returned unchanged.
+   */
+  transformArray(arr, transform) {
+    if (!isArray(arr)) {
+      return arr;
+    }
+
+    return arr.map(transform, this);
+  }
+
   /** Transforms a <code>Map[string, ValueType]</code> using a given transform
    * method.
    *
@@ -235,7 +253,7 @@ class OpenApiTransformerBase {
     if (items !== undefined) {
       // Note: OpenAPI 3.0 disallows Arrays, 2.0 and 3.1 drafts allow it
       if (isArray(items)) {
-        newSchema.items = items.map(this.transformSchema, this);
+        newSchema.items = this.transformArray(items, this.transformSchema);
       } else {
         newSchema.items = this.transformSchema(items);
       }
@@ -296,7 +314,8 @@ class OpenApiTransformerBase {
     for (const schemaProp of ['allOf', 'anyOf', 'oneOf']) {
       const subSchemas = schema[schemaProp];
       if (isArray(subSchemas)) {
-        newSchema[schemaProp] = subSchemas.map(this.transformSchema, this);
+        newSchema[schemaProp] =
+          this.transformArray(subSchemas, this.transformSchema);
       }
     }
 
@@ -604,7 +623,7 @@ class OpenApiTransformerBase {
 
     if (isArray(operation.parameters)) {
       newOperation.parameters =
-        operation.parameters.map(this.transformParameter, this);
+        this.transformArray(operation.parameters, this.transformParameter);
     }
 
     if (operation.requestBody !== undefined) {
@@ -622,12 +641,15 @@ class OpenApiTransformerBase {
     }
 
     if (isArray(operation.security)) {
-      newOperation.security =
-        operation.security.map(this.transformSecurityRequirement, this);
+      newOperation.security = this.transformArray(
+        operation.security,
+        this.transformSecurityRequirement,
+      );
     }
 
     if (isArray(operation.servers)) {
-      newOperation.servers = operation.servers.map(this.transformServer, this);
+      newOperation.servers =
+        this.transformArray(operation.servers, this.transformServer);
     }
 
     return newOperation;
@@ -650,12 +672,13 @@ class OpenApiTransformerBase {
     const newPathItem = { ...pathItem };
 
     if (isArray(pathItem.servers)) {
-      newPathItem.servers = pathItem.servers.map(this.transformServer, this);
+      newPathItem.servers =
+        this.transformArray(pathItem.servers, this.transformServer);
     }
 
     if (isArray(pathItem.parameters)) {
       newPathItem.parameters =
-        pathItem.parameters.map(this.transformParameter, this);
+        this.transformArray(pathItem.parameters, this.transformParameter);
     }
 
     for (const method of Object.keys(pathItem)) {
@@ -960,7 +983,8 @@ class OpenApiTransformerBase {
     }
 
     if (isArray(openApi.servers)) {
-      newOpenApi.servers = openApi.servers.map(this.transformServer, this);
+      newOpenApi.servers =
+        this.transformArray(openApi.servers, this.transformServer);
     }
 
     // https://github.com/Azure/autorest/blob/master/docs/extensions/readme.md#x-ms-parameterized-host
@@ -971,7 +995,7 @@ class OpenApiTransformerBase {
       if (isArray(parameters)) {
         newOpenApi['x-ms-parameterized-host'] = {
           ...xMsParameterizedHost,
-          parameters: parameters.map(this.transformParameter, this),
+          parameters: this.transformArray(parameters, this.transformParameter),
         };
       }
     }
@@ -1013,12 +1037,14 @@ class OpenApiTransformerBase {
     }
 
     if (isArray(openApi.security)) {
-      newOpenApi.security =
-        openApi.security.map(this.transformSecurityRequirement, this);
+      newOpenApi.security = this.transformArray(
+        openApi.security,
+        this.transformSecurityRequirement,
+      );
     }
 
     if (isArray(openApi.tags)) {
-      newOpenApi.tags = openApi.tags.map(this.transformTag, this);
+      newOpenApi.tags = this.transformArray(openApi.tags, this.transformTag);
     }
 
     if (openApi.externalDocs !== undefined) {
