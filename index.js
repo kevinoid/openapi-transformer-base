@@ -17,26 +17,26 @@ const { isArray } = Array;
  */
 const httpMethodSet = new Set(METHODS);
 
-/** Transforms a value which has type object<string,T> but is not defined as
- * Map[string,T] in OpenAPI.
+/** Transforms a value which has type object<string,ValueType> but is not
+ * defined as Map[string,ValueType] in OpenAPI.
  *
  * Note: This is currently used for schema properties, where #transformMap()
  * often complicates transformations due to differences with Map[string,Schema]
  * on definitions/components.schema and complicates optimizations.
  *
  * @private
- * @template T, U
+ * @template ValueType, TransformedType
  * @this {!OpenApiTransformerBase}
- * @param {!object<string,T>|*} obj Map-like object to transform.
- * @param {function(this:!OpenApiTransformerBase, T): U} transform Method which
- * transforms values in obj.
+ * @param {!object<string,ValueType>|*} obj Map-like object to transform.
+ * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
+ * } transform Method which transforms values in obj.
  * @param {boolean=} skipExtensions If true, do not call transform on {@link
  * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#specificationExtensions
  * Specification Extensions} (i.e.  properties starting with "x-").
  * Such properties are copied to the returned object without transformation.
- * @returns {!object<string,U>|*} If obj is a Map, a plain object with the
- * same own enumerable string-keyed properties as obj with values returned
- * by transform.  Otherwise, obj is returned unchanged.
+ * @returns {!object<string,TransformedType>|*} If obj is a Map, a plain object
+ * with the same own enumerable string-keyed properties as obj with values
+ * returned by transform.  Otherwise, obj is returned unchanged.
  */
 function transformMapLike(obj, transform, skipExtensions) {
   if (typeof obj !== 'object' || obj === null) {
@@ -103,7 +103,8 @@ function transformMapLike(obj, transform, skipExtensions) {
  * </ul>
  */
 class OpenApiTransformerBase {
-  /** Transforms a <code>Map[string, T]</code> using a given transform method.
+  /** Transforms a <code>Map[string, ValueType]</code> using a given transform
+   * method.
    *
    * Similar to modify-values and _.mapValues from lodash.
    *
@@ -116,13 +117,13 @@ class OpenApiTransformerBase {
    * the first argument with transformed values.</li>
    * </ul>
    *
-   * @template T, U
-   * @param {!object<string,T>|*} obj Map to transform.
-   * @param {function(this:!OpenApiTransformerBase, T): U} transform Method
-   * which transforms values in obj.
-   * @returns {!object<string,U>|*} If obj is a Map, a plain object with the
-   * same own enumerable string-keyed properties as obj with values returned
-   * by transform.  Otherwise, obj is returned unchanged.
+   * @template ValueType, TransformedType
+   * @param {!object<string,ValueType>|*} obj Map to transform.
+   * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
+   * } transform Method which transforms values in obj.
+   * @returns {!object<string,TransformedType>|*} If obj is a Map, a plain
+   * object with the same own enumerable string-keyed properties as obj with
+   * values returned by transform.  Otherwise, obj is returned unchanged.
    */
   transformMap(obj, transform) {
     return transformMapLike.call(this, obj, transform);
