@@ -34,11 +34,19 @@ const httpMethodSet = new Set(METHODS);
 function visit(transformer, method, propName, ...args) {
   transformer.transformPath.push(propName);
 
+  let handlingException = false;
   try {
     return method.apply(transformer, args);
+  } catch (err) {
+    handlingException = true;
+    throw err;
   } finally {
     const popProp = transformer.transformPath.pop();
-    assert.strictEqual(popProp, propName);
+
+    // Avoid clobbering an exception which is already propagating
+    if (!handlingException) {
+      assert.strictEqual(popProp, propName);
+    }
   }
 }
 
