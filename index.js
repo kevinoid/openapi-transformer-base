@@ -308,13 +308,21 @@ class OpenApiTransformerBase {
     }
 
     if (properties !== undefined) {
-      newSchema.properties =
-        transformMapLike.call(this, properties, this.transformSchema, 'Schema');
+      newSchema.properties = visit(
+        this,
+        transformMapLike,
+        'properties',
+        properties,
+        this.transformSchema,
+        'Schema',
+      );
     }
 
     if (patternProperties !== undefined) {
-      newSchema.patternProperties = transformMapLike.call(
+      newSchema.patternProperties = visit(
         this,
+        transformMapLike,
+        'patternProperties',
         patternProperties,
         this.transformSchema,
         'Schema',
@@ -362,8 +370,10 @@ class OpenApiTransformerBase {
     }
 
     if (dependentSchemas !== undefined) {
-      newSchema.dependentSchemas = transformMapLike.call(
+      newSchema.dependentSchemas = visit(
         this,
+        transformMapLike,
+        'dependentSchemas',
         dependentSchemas,
         this.transformSchema,
         'Schema',
@@ -382,8 +392,13 @@ class OpenApiTransformerBase {
     for (const schemaProp of ['allOf', 'anyOf', 'oneOf']) {
       const subSchemas = schema[schemaProp];
       if (subSchemas !== undefined) {
-        newSchema[schemaProp] =
-          this.transformArray(subSchemas, this.transformSchema);
+        newSchema[schemaProp] = visit(
+          this,
+          this.transformArray,
+          schemaProp,
+          subSchemas,
+          this.transformSchema,
+        );
       }
     }
 
