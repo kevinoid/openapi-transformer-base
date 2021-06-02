@@ -7,9 +7,14 @@
 'use strict';
 
 const { METHODS } = require('http');
+const { debuglog } = require('util');
+
+const toJsonPointer = require('./lib/to-json-pointer.js');
 const visit = require('./visit.js');
 
 const { isArray } = Array;
+
+const debug = debuglog('openapi-transformer-base');
 
 /** HTTP method names which are properties of a Path Item Object that have
  * Operation Object values.
@@ -1331,6 +1336,24 @@ class OpenApiTransformerBase {
     }
 
     return newOpenApi;
+  }
+
+  /** Logs a warning about the transformation.
+   *
+   * Logs to util.debuglog('openapi-transformer-base') by default.  Designed
+   * to be overridden and/or reassigned to log as appropriate for projects
+   * which use this class.
+   *
+   * @param {string|*} message Message with zero or more substitution strings,
+   * or first value to log.
+   * @param {*} values Additional values to log.  Applied to substitution
+   * string in message, if one matches, otherwise appended.
+   */
+  warn(message, ...values) {
+    // Note: debug.enabled defined on Node.js v14.9.0 and later
+    if (debug.enabled !== false) {
+      debug(message, ...values, 'at', toJsonPointer(this.transformPath));
+    }
   }
 }
 
