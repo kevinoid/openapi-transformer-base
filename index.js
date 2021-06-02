@@ -36,6 +36,7 @@ const httpMethodSet = new Set(METHODS);
  * @param {!object<string,ValueType>|*} obj Map-like object to transform.
  * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
  * } transform Method which transforms values in obj.
+ * @param {string} logName Name of object being transformed (for logging).
  * @param {boolean=} skipExtensions If true, do not call transform on {@link
  * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#specificationExtensions
  * Specification Extensions} (i.e.  properties starting with "x-").
@@ -44,9 +45,9 @@ const httpMethodSet = new Set(METHODS);
  * with the same own enumerable string-keyed properties as obj with values
  * returned by transform.  Otherwise, obj is returned unchanged.
  */
-function transformMapLike(obj, transform, skipExtensions) {
+function transformMapLike(obj, transform, logName, skipExtensions) {
   if (typeof obj !== 'object' || obj === null) {
-    this.warn('Ignoring non-object Map', obj);
+    this.warn(`Ignoring non-object ${logName}`, obj);
     return obj;
   }
 
@@ -54,7 +55,7 @@ function transformMapLike(obj, transform, skipExtensions) {
     // Note: This function is only called for values specified as Map[X,Y]
     // in the OpenAPI Specification.  Array values are invalid and it would
     // be unsafe to assume that their contents are type Y.  Return unchanged.
-    this.warn('Ignoring non-object Map', obj);
+    this.warn(`Ignoring non-object ${logName}`, obj);
     return obj;
   }
 
@@ -161,7 +162,7 @@ class OpenApiTransformerBase {
    * values returned by transform.  Otherwise, obj is returned unchanged.
    */
   transformMap(obj, transform) {
-    return transformMapLike.call(this, obj, transform);
+    return transformMapLike.call(this, obj, transform, 'Map');
   }
 
   /** Transforms a {@link
@@ -308,12 +309,16 @@ class OpenApiTransformerBase {
 
     if (properties !== undefined) {
       newSchema.properties =
-        transformMapLike.call(this, properties, this.transformSchema);
+        transformMapLike.call(this, properties, this.transformSchema, 'Schema');
     }
 
     if (patternProperties !== undefined) {
-      newSchema.patternProperties =
-        transformMapLike.call(this, patternProperties, this.transformSchema);
+      newSchema.patternProperties = transformMapLike.call(
+        this,
+        patternProperties,
+        this.transformSchema,
+        'Schema',
+      );
     }
 
     if (unevaluatedProperties !== undefined) {
@@ -357,8 +362,12 @@ class OpenApiTransformerBase {
     }
 
     if (dependentSchemas !== undefined) {
-      newSchema.dependentSchemas =
-        transformMapLike.call(this, dependentSchemas, this.transformSchema);
+      newSchema.dependentSchemas = transformMapLike.call(
+        this,
+        dependentSchemas,
+        this.transformSchema,
+        'Schema',
+      );
     }
 
     if (contains !== undefined) {
@@ -728,7 +737,13 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Callback Object.
    */
   transformCallback(callback) {
-    return transformMapLike.call(this, callback, this.transformPathItem, true);
+    return transformMapLike.call(
+      this,
+      callback,
+      this.transformPathItem,
+      'Callback',
+      true,
+    );
   }
 
   /** Transforms a {@link
@@ -896,7 +911,13 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Paths Object.
    */
   transformPaths(paths) {
-    return transformMapLike.call(this, paths, this.transformPathItem, true);
+    return transformMapLike.call(
+      this,
+      paths,
+      this.transformPathItem,
+      'Paths',
+      true,
+    );
   }
 
   /** Transforms a {@link
