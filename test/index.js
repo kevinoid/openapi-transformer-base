@@ -486,7 +486,8 @@ describe('OpenApiTransformerBase', () => {
       assert.deepStrictEqual(t.transformMap(obj, mapper), obj);
       sinon.assert.notCalled(mapper);
       sinon.assert.calledOnce(t.transformMap);
-      assertOnlyCalledMethods(t, [t.transformMap]);
+      sinon.assert.calledOnce(t.warn);
+      assertOnlyCalledMethods(t, [t.transformMap, t.warn]);
     });
   });
 
@@ -1355,7 +1356,12 @@ describe('OpenApiTransformerBase', () => {
         sinon.assert.calledOnce(t.transformArray);
         sinon.assert.alwaysCalledOn(t.transformArray, t);
         sinon.assert.calledOnce(t.transformSchema);
-        assertOnlyCalledMethods(t, [t.transformSchema, t.transformArray]);
+        sinon.assert.calledOnce(t.warn);
+        assertOnlyCalledMethods(t, [
+          t.transformSchema,
+          t.transformArray,
+          t.warn,
+        ]);
       });
 
       it(`does not transformSchema on undefined ${schemaArrayProp}`, () => {

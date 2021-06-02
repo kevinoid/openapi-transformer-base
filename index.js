@@ -46,6 +46,7 @@ const httpMethodSet = new Set(METHODS);
  */
 function transformMapLike(obj, transform, skipExtensions) {
   if (typeof obj !== 'object' || obj === null) {
+    this.warn('Ignoring non-object Map', obj);
     return obj;
   }
 
@@ -53,6 +54,7 @@ function transformMapLike(obj, transform, skipExtensions) {
     // Note: This function is only called for values specified as Map[X,Y]
     // in the OpenAPI Specification.  Array values are invalid and it would
     // be unsafe to assume that their contents are type Y.  Return unchanged.
+    this.warn('Ignoring non-object Map', obj);
     return obj;
   }
 
@@ -129,6 +131,7 @@ class OpenApiTransformerBase {
    */
   transformArray(arr, transform) {
     if (!isArray(arr)) {
+      this.warn('Ignoring non-Array', arr);
       return arr;
     }
 
@@ -234,6 +237,14 @@ class OpenApiTransformerBase {
    */
   transformSchema(schema) {
     if (typeof schema !== 'object' || schema === null || isArray(schema)) {
+      // Note: JSON Schema Core draft-handrews-json-schema-02 (referenced by
+      // current/ OpenAPI 3.1 drafts) defines true and false as valid schemas
+      // with true equivalent to {} and false equivalent to {not:{}}
+      // https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.3.2
+      if (typeof schema !== 'boolean') {
+        this.warn('Ignoring non-object Schema', schema);
+      }
+
       return schema;
     }
 
@@ -385,10 +396,12 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Items Object.
    */
   transformItems(items) {
-    if (typeof items !== 'object'
-      || items === null
-      || isArray(items)
-      || items.items === undefined) {
+    if (typeof items !== 'object' || items === null || isArray(items)) {
+      this.warn('Ignoring non-object Items', items);
+      return items;
+    }
+
+    if (items.items === undefined) {
       return items;
     }
 
@@ -409,6 +422,7 @@ class OpenApiTransformerBase {
     if (typeof header !== 'object'
       || header === null
       || isArray(header)) {
+      this.warn('Ignoring non-object Header', header);
       return header;
     }
 
@@ -440,8 +454,12 @@ class OpenApiTransformerBase {
   transformEncoding(encoding) {
     if (typeof encoding !== 'object'
       || encoding === null
-      || isArray(encoding)
-      || encoding.headers === undefined) {
+      || isArray(encoding)) {
+      this.warn('Ignoring non-object Encoding', encoding);
+      return encoding;
+    }
+
+    if (encoding.headers === undefined) {
       return encoding;
     }
 
@@ -467,8 +485,12 @@ class OpenApiTransformerBase {
   transformLink(link) {
     if (typeof link !== 'object'
       || link === null
-      || isArray(link)
-      || link.server === undefined) {
+      || isArray(link)) {
+      this.warn('Ignoring non-object Link', link);
+      return link;
+    }
+
+    if (link.server === undefined) {
       return link;
     }
 
@@ -489,6 +511,7 @@ class OpenApiTransformerBase {
     if (typeof mediaType !== 'object'
       || mediaType === null
       || isArray(mediaType)) {
+      this.warn('Ignoring non-object Media Type', mediaType);
       return mediaType;
     }
 
@@ -537,6 +560,7 @@ class OpenApiTransformerBase {
     if (typeof response !== 'object'
       || response === null
       || isArray(response)) {
+      this.warn('Ignoring non-object Response', response);
       return response;
     }
 
@@ -607,6 +631,7 @@ class OpenApiTransformerBase {
     if (typeof parameter !== 'object'
       || parameter === null
       || isArray(parameter)) {
+      this.warn('Ignoring non-object Parameter', parameter);
       return parameter;
     }
 
@@ -662,6 +687,7 @@ class OpenApiTransformerBase {
    */
   transformResponses(responses) {
     if (!responses || typeof responses !== 'object' || isArray(responses)) {
+      this.warn('Ignoring non-object Responses', responses);
       return responses;
     }
 
@@ -686,6 +712,8 @@ class OpenApiTransformerBase {
             response,
           );
         }
+      } else if (prop !== '$ref' && !prop.startsWith('x-')) {
+        this.warn('Ignoring unrecognized property of Responses', prop);
       }
     }
 
@@ -713,8 +741,12 @@ class OpenApiTransformerBase {
   transformRequestBody(requestBody) {
     if (typeof requestBody !== 'object'
       || requestBody === null
-      || isArray(requestBody)
-      || requestBody.content === undefined) {
+      || isArray(requestBody)) {
+      this.warn('Ignoring non-object Request Body', requestBody);
+      return requestBody;
+    }
+
+    if (requestBody.content === undefined) {
       return requestBody;
     }
 
@@ -741,6 +773,7 @@ class OpenApiTransformerBase {
     if (typeof operation !== 'object'
       || operation === null
       || isArray(operation)) {
+      this.warn('Ignoring non-object Operation', operation);
       return operation;
     }
 
@@ -814,6 +847,7 @@ class OpenApiTransformerBase {
     if (typeof pathItem !== 'object'
       || pathItem === null
       || isArray(pathItem)) {
+      this.warn('Ignoring non-object Path Item', pathItem);
       return pathItem;
     }
 
@@ -838,6 +872,13 @@ class OpenApiTransformerBase {
           method,
           operation,
         );
+      } else if (method !== '$ref'
+        && method !== 'description'
+        && method !== 'parameters'
+        && method !== 'servers'
+        && method !== 'summary'
+        && !method.startsWith('x-')) {
+        this.warn('Ignoring unrecognized property of Path Item', method);
       }
     }
 
@@ -869,6 +910,7 @@ class OpenApiTransformerBase {
     if (typeof components !== 'object'
       || components === null
       || isArray(components)) {
+      this.warn('Ignoring non-object Components', components);
       return components;
     }
 
@@ -997,10 +1039,12 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Server Object.
    */
   transformServer(server) {
-    if (typeof server !== 'object'
-      || server === null
-      || isArray(server)
-      || server.variables === undefined) {
+    if (typeof server !== 'object' || server === null || isArray(server)) {
+      this.warn('Ignoring non-object Server', server);
+      return server;
+    }
+
+    if (server.variables === undefined) {
       return server;
     }
 
@@ -1037,6 +1081,7 @@ class OpenApiTransformerBase {
    */
   transformOAuthFlows(flows) {
     if (typeof flows !== 'object' || flows === null || isArray(flows)) {
+      this.warn('Ignoring non-object OAuth Flows', flows);
       return flows;
     }
 
@@ -1091,8 +1136,12 @@ class OpenApiTransformerBase {
   transformSecurityScheme(securityScheme) {
     if (typeof securityScheme !== 'object'
       || securityScheme === null
-      || isArray(securityScheme)
-      || securityScheme.flows === undefined) {
+      || isArray(securityScheme)) {
+      this.warn('Ignoring non-object Security Scheme', securityScheme);
+      return securityScheme;
+    }
+
+    if (securityScheme.flows === undefined) {
       return securityScheme;
     }
 
@@ -1127,10 +1176,12 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Tag Object.
    */
   transformTag(tag) {
-    if (typeof tag !== 'object'
-      || tag === null
-      || isArray(tag)
-      || tag.externalDocs === undefined) {
+    if (typeof tag !== 'object' || tag === null || isArray(tag)) {
+      this.warn('Ignoring non-object Tag', tag);
+      return tag;
+    }
+
+    if (tag.externalDocs === undefined) {
       return tag;
     }
 
@@ -1178,6 +1229,7 @@ class OpenApiTransformerBase {
    */
   transformInfo(info) {
     if (typeof info !== 'object' || info === null || isArray(info)) {
+      this.warn('Ignoring non-object Info', info);
       return info;
     }
 
@@ -1215,6 +1267,7 @@ class OpenApiTransformerBase {
    */
   transformOpenApi(openApi) {
     if (typeof openApi !== 'object' || openApi === null || isArray(openApi)) {
+      this.warn('Ignoring non-object OpenAPI', openApi);
       return openApi;
     }
 
