@@ -310,11 +310,9 @@ class OpenApiTransformerBase {
     if (properties !== undefined) {
       newSchema.properties = visit(
         this,
-        transformMapLike,
+        this.transformSchemaProperties,
         'properties',
         properties,
-        this.transformSchema,
-        'Schema',
       );
     }
 
@@ -407,6 +405,22 @@ class OpenApiTransformerBase {
     // See https://github.com/OAI/OpenAPI-Specification/issues/2094
 
     return newSchema;
+  }
+
+  /** Transforms {@link
+   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#schemaObject
+   * Schema Object} properties.
+   *
+   * @param {!object} properties Schema Object properties.
+   * @returns {!object} Transformed Schema Object properties.
+   */
+  transformSchemaProperties(properties) {
+    return transformMapLike.call(
+      this,
+      properties,
+      this.transformSchema,
+      'Schema properties',
+    );
   }
 
   /** Transforms an {@link

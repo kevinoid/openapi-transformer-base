@@ -1248,6 +1248,20 @@ describe('OpenApiTransformerBase', () => {
       assertOnlyCalledMethods(t, [t.transformSchema, t.transformXml]);
     });
 
+    it('calls transformSchemaProperties on properties', () => {
+      const t = sinon.spy(new OpenApiTransformerBase());
+      const schema = deepFreeze({ properties: {} });
+      assert.deepStrictEqual(t.transformSchema(schema), schema);
+      sinon.assert.calledWith(t.transformSchemaProperties, schema.properties);
+      sinon.assert.calledOnce(t.transformSchemaProperties);
+      sinon.assert.alwaysCalledOn(t.transformSchemaProperties, t);
+      sinon.assert.calledOnce(t.transformSchema);
+      assertOnlyCalledMethods(t, [
+        t.transformSchema,
+        t.transformSchemaProperties,
+      ]);
+    });
+
     it('calls transformSchema on non-Array items', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
       const schema = deepFreeze({ items: {} });
@@ -1297,7 +1311,6 @@ describe('OpenApiTransformerBase', () => {
     for (const schemaMapProp of [
       'dependentSchemas',
       'patternProperties',
-      'properties',
     ]) {
       it(`calls transformSchema on each value of ${schemaMapProp}`, () => {
         const t = sinon.spy(new OpenApiTransformerBase());
@@ -1382,6 +1395,50 @@ describe('OpenApiTransformerBase', () => {
       assert.deepStrictEqual(t.transformSchema(schema), schema);
       sinon.assert.calledOnce(t.transformSchema);
       assertOnlyCalledMethods(t, [t.transformSchema]);
+    });
+  });
+
+  describe('#transformSchemaProperties()', () => {
+    methodPreservesArgumentType('transformSchemaProperties');
+
+    it('calls transformSchema on each value', () => {
+      const t = sinon.spy(new OpenApiTransformerBase());
+      const properties = deepFreeze({
+        a: {},
+        b: {},
+      });
+      assert.deepStrictEqual(
+        t.transformSchemaProperties(properties),
+        properties,
+      );
+      const values = Object.values(properties);
+      sinon.assert.calledWith(t.transformSchema, values[0]);
+      sinon.assert.calledWith(t.transformSchema, values[1]);
+      sinon.assert.calledTwice(t.transformSchema);
+      sinon.assert.alwaysCalledOn(t.transformSchema, t);
+      sinon.assert.calledOnce(t.transformSchemaProperties);
+      assertOnlyCalledMethods(t, [
+        t.transformSchemaProperties,
+        t.transformSchema,
+      ]);
+    });
+
+    // See: Specification Extension Property Ambiguity above
+    it('calls transformSchema on x- properties', () => {
+      const t = sinon.spy(new OpenApiTransformerBase());
+      const properties = deepFreeze({ 'x-test': {} });
+      assert.deepStrictEqual(
+        t.transformSchemaProperties(properties),
+        properties,
+      );
+      sinon.assert.calledWith(t.transformSchema, properties['x-test']);
+      sinon.assert.calledOnce(t.transformSchema);
+      sinon.assert.alwaysCalledOn(t.transformSchema, t);
+      sinon.assert.calledOnce(t.transformSchemaProperties);
+      assertOnlyCalledMethods(t, [
+        t.transformSchemaProperties,
+        t.transformSchema,
+      ]);
     });
   });
 
