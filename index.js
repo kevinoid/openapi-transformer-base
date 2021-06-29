@@ -230,8 +230,8 @@ class OpenApiTransformerBase {
    * Schema Object}.
    *
    * Note: For OpenAPI 2.0 documents, consider overriding
-   * {@see transformParameter} and {@see transformItems} to transform all
-   * schema-like objects.
+   * {@see transformParameter}, {@see transformItems}, and
+   * {@see transformHeader} to transform all schema-like objects.
    *
    * @param {!object} schema Schema Object.
    * @returns {!object} Transformed Schema Object.
