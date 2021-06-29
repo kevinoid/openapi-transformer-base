@@ -21,7 +21,7 @@ const debug = debuglog('openapi-transformer-base');
  *
  * @private
  */
-const httpMethodSet = new Set(METHODS);
+const httpMethodSet = new Set(METHODS.map((method) => method.toLowerCase()));
 
 /** Transforms a value which has type object<string,ValueType> but is not
  * defined as Map[string,ValueType] in OpenAPI.
@@ -908,7 +908,7 @@ class OpenApiTransformerBase {
     }
 
     for (const [method, operation] of Object.entries(pathItem)) {
-      if (operation !== undefined && httpMethodSet.has(method.toUpperCase())) {
+      if (operation !== undefined && httpMethodSet.has(method.toLowerCase())) {
         newPathItem[method] = visit(
           this,
           this.transformOperation,
