@@ -907,8 +907,7 @@ class OpenApiTransformerBase {
         this.transformArray(pathItem.parameters, this.transformParameter);
     }
 
-    for (const method of Object.keys(pathItem)) {
-      const operation = pathItem[method];
+    for (const [method, operation] of Object.entries(pathItem)) {
       if (operation !== undefined && httpMethodSet.has(method.toUpperCase())) {
         newPathItem[method] = visit(
           this,
