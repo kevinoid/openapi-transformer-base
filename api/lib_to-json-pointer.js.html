@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: openapi-transformer-base</title>
+    <title>JSDoc: Source: lib/to-json-pointer.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,59 +17,38 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: openapi-transformer-base</h1>
+    <h1 class="page-title">Source: lib/to-json-pointer.js</h1>
 
     
 
 
 
-
-<section>
-
-<header>
     
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @copyright Copyright 2021 Kevin Locke &lt;kevin@kevinlocke.name>
+ * @license MIT
+ */
 
-<article>
-    <div class="container-overview">
-    
-        
+'use strict';
 
-        
-    
-    </div>
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="module-openapi-transformer-base-OpenApiTransformerBase.html">OpenApiTransformerBase</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+/** Convert an Array of property names to a JSON Pointer (RFC 6901).
+ *
+ * @param {!Array&lt;string>} propPath Property names.
+ * @returns {string} JSON Pointer.
+ */
+module.exports =
+function toJsonPointer(propPath) {
+  // eslint-disable-next-line prefer-template
+  return '/' + propPath
+    // TODO [engine:node@>=15]: .replaceAll()
+    .map((p) => p.replace(/~/g, '~0').replace(/\//g, '~1'))
+    .join('/');
+};
+</code></pre>
+        </article>
+    </section>
 
 
 

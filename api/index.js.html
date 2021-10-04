@@ -35,37 +35,47 @@
 'use strict';
 
 const { METHODS } = require('http');
+const { debuglog } = require('util');
+
+const toJsonPointer = require('./lib/to-json-pointer.js');
+const visit = require('./visit.js');
 
 const { isArray } = Array;
+
+const debug = debuglog('openapi-transformer-base');
 
 /** HTTP method names which are properties of a Path Item Object that have
  * Operation Object values.
  *
  * @private
  */
-const httpMethodSet = new Set(METHODS);
+const httpMethodSet = new Set(METHODS.map((method) => method.toLowerCase()));
 
-/** Transforms a value which has type object&lt;string,T> but is not defined as
- * Map[string,T] in OpenAPI.
+/** Transforms a value which has type object&lt;string,ValueType> but is not
+ * defined as Map[string,ValueType] in OpenAPI.
  *
  * Note: This is currently used for schema properties, where #transformMap()
  * often complicates transformations due to differences with Map[string,Schema]
  * on definitions/components.schema and complicates optimizations.
  *
  * @private
- * @template T, U
- * @param {!object&lt;string,T>|*} obj Map-like object to transform.
- * @param {function(T): U} transform Method which transforms values in obj.
+ * @template ValueType, TransformedType
+ * @this {!OpenApiTransformerBase}
+ * @param {!object&lt;string,ValueType>|*} obj Map-like object to transform.
+ * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
+ * } transform Method which transforms values in obj.
+ * @param {string} logName Name of object being transformed (for logging).
  * @param {boolean=} skipExtensions If true, do not call transform on {@link
  * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#specificationExtensions
  * Specification Extensions} (i.e.  properties starting with "x-").
  * Such properties are copied to the returned object without transformation.
- * @returns {!object&lt;string,U>|*} If obj is a Map, a plain object with the
- * same own enumerable string-keyed properties as obj with values returned
- * by transform.  Otherwise, obj is returned unchanged.
+ * @returns {!object&lt;string,TransformedType>|*} If obj is a Map, a plain object
+ * with the same own enumerable string-keyed properties as obj with values
+ * returned by transform.  Otherwise, obj is returned unchanged.
  */
-function transformMapLike(obj, transform, skipExtensions) {
+function transformMapLike(obj, transform, logName, skipExtensions) {
   if (typeof obj !== 'object' || obj === null) {
+    this.warn(`Ignoring non-object ${logName}`, obj);
     return obj;
   }
 
@@ -73,6 +83,7 @@ function transformMapLike(obj, transform, skipExtensions) {
     // Note: This function is only called for values specified as Map[X,Y]
     // in the OpenAPI Specification.  Array values are invalid and it would
     // be unsafe to assume that their contents are type Y.  Return unchanged.
+    this.warn(`Ignoring non-object ${logName}`, obj);
     return obj;
   }
 
@@ -80,7 +91,7 @@ function transformMapLike(obj, transform, skipExtensions) {
   for (const [propName, propValue] of Object.entries(obj)) {
     if (propValue !== undefined
       &amp;&amp; (!skipExtensions || !propName.startsWith('x-'))) {
-      newObj[propName] = transform.call(this, propValue);
+      newObj[propName] = visit(this, transform, propName, propValue);
     }
   }
 
@@ -129,7 +140,36 @@ function transformMapLike(obj, transform, skipExtensions) {
  * &lt;/ul>
  */
 class OpenApiTransformerBase {
-  /** Transforms a &lt;code>Map[string, T]&lt;/code> using a given transform method.
+  constructor() {
+    /** Property names traversed in current transformation.
+     *
+     * @type {!Array&lt;string>}
+     */
+    Object.defineProperty(this, 'transformPath', { value: [] });
+  }
+
+  /** Transforms an &lt;code>Array[ValueType]&lt;/code> using a given transform
+   * method.
+   *
+   * @template ValueType, TransformedType
+   * @param {!Array&lt;ValueType>|*} arr Array to transform.
+   * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
+   * } transform Method which transforms values in arr.
+   * @returns {!Array&lt;TransformedType>|*} If arr is an Array, the result of
+   * Array#map(transform).  Otherwise, obj is returned unchanged.
+   */
+  transformArray(arr, transform) {
+    if (!isArray(arr)) {
+      this.warn('Ignoring non-Array', arr);
+      return arr;
+    }
+
+    // eslint-disable-next-line unicorn/no-array-method-this-argument
+    return arr.map(transform, this);
+  }
+
+  /** Transforms a &lt;code>Map[string, ValueType]&lt;/code> using a given transform
+   * method.
    *
    * Similar to modify-values and _.mapValues from lodash.
    *
@@ -142,15 +182,16 @@ class OpenApiTransformerBase {
    * the first argument with transformed values.&lt;/li>
    * &lt;/ul>
    *
-   * @template T, U
-   * @param {!object&lt;string,T>|*} obj Map to transform.
-   * @param {function(T): U} transform Method which transforms values in obj.
-   * @returns {!object&lt;string,U>|*} If obj is a Map, a plain object with the
-   * same own enumerable string-keyed properties as obj with values returned
-   * by transform.  Otherwise, obj is returned unchanged.
+   * @template ValueType, TransformedType
+   * @param {!object&lt;string,ValueType>|*} obj Map to transform.
+   * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
+   * } transform Method which transforms values in obj.
+   * @returns {!object&lt;string,TransformedType>|*} If obj is a Map, a plain
+   * object with the same own enumerable string-keyed properties as obj with
+   * values returned by transform.  Otherwise, obj is returned unchanged.
    */
   transformMap(obj, transform) {
-    return transformMapLike.call(this, obj, transform);
+    return transformMapLike.call(this, obj, transform, 'Map');
   }
 
   /** Transforms a {@link
@@ -218,14 +259,22 @@ class OpenApiTransformerBase {
    * Schema Object}.
    *
    * Note: For OpenAPI 2.0 documents, consider overriding
-   * {@see transformParameter} and {@see transformItems} to transform all
-   * schema-like objects.
+   * {@see transformParameter}, {@see transformItems}, and
+   * {@see transformHeader} to transform all schema-like objects.
    *
    * @param {!object} schema Schema Object.
    * @returns {!object} Transformed Schema Object.
    */
   transformSchema(schema) {
     if (typeof schema !== 'object' || schema === null || isArray(schema)) {
+      // Note: JSON Schema Core draft-handrews-json-schema-02 (referenced by
+      // current/ OpenAPI 3.1 drafts) defines true and false as valid schemas
+      // with true equivalent to {} and false equivalent to {not:{}}
+      // https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.3.2
+      if (typeof schema !== 'boolean') {
+        this.warn('Ignoring non-object Schema', schema);
+      }
+
       return schema;
     }
 
@@ -245,50 +294,84 @@ class OpenApiTransformerBase {
     } = schema;
 
     if (discriminator !== undefined) {
-      newSchema.discriminator = this.transformDiscriminator(discriminator);
+      newSchema.discriminator = visit(
+        this,
+        this.transformDiscriminator,
+        'discriminator',
+        discriminator,
+      );
     }
 
     if (externalDocs !== undefined) {
-      newSchema.externalDocs = this.transformExternalDocs(externalDocs);
+      newSchema.externalDocs = visit(
+        this,
+        this.transformExternalDocs,
+        'externalDocs',
+        externalDocs,
+      );
     }
 
     if (xml !== undefined) {
-      newSchema.xml = this.transformXml(xml);
+      newSchema.xml = visit(this, this.transformXml, 'xml', xml);
     }
 
     if (items !== undefined) {
       // Note: OpenAPI 3.0 disallows Arrays, 2.0 and 3.1 drafts allow it
       if (isArray(items)) {
-        newSchema.items = items.map(this.transformSchema, this);
+        newSchema.items = this.transformArray(items, this.transformSchema);
       } else {
-        newSchema.items = this.transformSchema(items);
+        newSchema.items = visit(this, this.transformSchema, 'items', items);
       }
     }
 
     for (const schemaProp of ['if', 'then', 'else', 'not']) {
       const subSchema = schema[schemaProp];
       if (subSchema !== undefined) {
-        newSchema[schemaProp] = this.transformSchema(subSchema);
+        newSchema[schemaProp] = visit(
+          this,
+          this.transformSchema,
+          'subSchema',
+          subSchema,
+        );
       }
     }
 
     if (properties !== undefined) {
-      newSchema.properties =
-        transformMapLike.call(this, properties, this.transformSchema);
+      newSchema.properties = visit(
+        this,
+        this.transformSchemaProperties,
+        'properties',
+        properties,
+      );
     }
 
     if (patternProperties !== undefined) {
-      newSchema.patternProperties =
-        transformMapLike.call(this, patternProperties, this.transformSchema);
+      newSchema.patternProperties = visit(
+        this,
+        transformMapLike,
+        'patternProperties',
+        patternProperties,
+        this.transformSchema,
+        'Schema',
+      );
     }
 
     if (unevaluatedProperties !== undefined) {
-      newSchema.unevaluatedProperties =
-        this.transformSchema(unevaluatedProperties);
+      newSchema.unevaluatedProperties = visit(
+        this,
+        this.transformSchema,
+        'unevaluatedProperties',
+        unevaluatedProperties,
+      );
     }
 
     if (propertyNames !== undefined) {
-      newSchema.propertyNames = this.transformSchema(propertyNames);
+      newSchema.propertyNames = visit(
+        this,
+        this.transformSchema,
+        'propertyNames',
+        propertyNames,
+      );
     }
 
     // Note: JSON Schema Core draft-handrews-json-schema-02 (referenced by
@@ -299,28 +382,50 @@ class OpenApiTransformerBase {
     for (const schemaProp of ['additionalItems', 'additionalProperties']) {
       const additionalItemsProps = schema[schemaProp];
       if (additionalItemsProps !== undefined) {
-        newSchema[schemaProp] = this.transformSchema(additionalItemsProps);
+        newSchema[schemaProp] = visit(
+          this,
+          this.transformSchema,
+          schemaProp,
+          additionalItemsProps,
+        );
       }
     }
 
     if (unevaluatedItems !== undefined) {
       newSchema.unevaluatedItems =
-        this.transformSchema(unevaluatedItems);
+        visit(this, this.transformSchema, 'unevaluatedItems', unevaluatedItems);
     }
 
     if (dependentSchemas !== undefined) {
-      newSchema.dependentSchemas =
-        transformMapLike.call(this, dependentSchemas, this.transformSchema);
+      newSchema.dependentSchemas = visit(
+        this,
+        transformMapLike,
+        'dependentSchemas',
+        dependentSchemas,
+        this.transformSchema,
+        'Schema',
+      );
     }
 
     if (contains !== undefined) {
-      newSchema.contains = this.transformSchema(contains);
+      newSchema.contains = visit(
+        this,
+        this.transformSchema,
+        'contains',
+        contains,
+      );
     }
 
     for (const schemaProp of ['allOf', 'anyOf', 'oneOf']) {
       const subSchemas = schema[schemaProp];
-      if (isArray(subSchemas)) {
-        newSchema[schemaProp] = subSchemas.map(this.transformSchema, this);
+      if (subSchemas !== undefined) {
+        newSchema[schemaProp] = visit(
+          this,
+          this.transformArray,
+          schemaProp,
+          subSchemas,
+          this.transformSchema,
+        );
       }
     }
 
@@ -329,6 +434,22 @@ class OpenApiTransformerBase {
     // See https://github.com/OAI/OpenAPI-Specification/issues/2094
 
     return newSchema;
+  }
+
+  /** Transforms {@link
+   * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#schemaObject
+   * Schema Object} properties.
+   *
+   * @param {!object} properties Schema Object properties.
+   * @returns {!object} Transformed Schema Object properties.
+   */
+  transformSchemaProperties(properties) {
+    return transformMapLike.call(
+      this,
+      properties,
+      this.transformSchema,
+      'Schema properties',
+    );
   }
 
   /** Transforms an {@link
@@ -342,16 +463,18 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Items Object.
    */
   transformItems(items) {
-    if (typeof items !== 'object'
-      || items === null
-      || isArray(items)
-      || items.items === undefined) {
+    if (typeof items !== 'object' || items === null || isArray(items)) {
+      this.warn('Ignoring non-object Items', items);
+      return items;
+    }
+
+    if (items.items === undefined) {
       return items;
     }
 
     return {
       ...items,
-      items: this.transformItems(items.items),
+      items: visit(this, this.transformItems, 'items', items.items),
     };
   }
 
@@ -366,17 +489,23 @@ class OpenApiTransformerBase {
     if (typeof header !== 'object'
       || header === null
       || isArray(header)) {
+      this.warn('Ignoring non-object Header', header);
       return header;
     }
 
     const newHeader = { ...header };
 
     if (header.items !== undefined) {
-      newHeader.items = this.transformItems(header.items);
+      newHeader.items = visit(this, this.transformItems, 'items', header.items);
     }
 
     if (header.schema !== undefined) {
-      newHeader.schema = this.transformSchema(header.schema);
+      newHeader.schema = visit(
+        this,
+        this.transformSchema,
+        'schema',
+        header.schema,
+      );
     }
 
     return newHeader;
@@ -392,14 +521,24 @@ class OpenApiTransformerBase {
   transformEncoding(encoding) {
     if (typeof encoding !== 'object'
       || encoding === null
-      || isArray(encoding)
-      || encoding.headers === undefined) {
+      || isArray(encoding)) {
+      this.warn('Ignoring non-object Encoding', encoding);
+      return encoding;
+    }
+
+    if (encoding.headers === undefined) {
       return encoding;
     }
 
     return {
       ...encoding,
-      headers: this.transformMap(encoding.headers, this.transformHeader),
+      headers: visit(
+        this,
+        this.transformMap,
+        'headers',
+        encoding.headers,
+        this.transformHeader,
+      ),
     };
   }
 
@@ -413,14 +552,18 @@ class OpenApiTransformerBase {
   transformLink(link) {
     if (typeof link !== 'object'
       || link === null
-      || isArray(link)
-      || link.server === undefined) {
+      || isArray(link)) {
+      this.warn('Ignoring non-object Link', link);
+      return link;
+    }
+
+    if (link.server === undefined) {
       return link;
     }
 
     return {
       ...link,
-      server: this.transformServer(link.server),
+      server: visit(this, this.transformServer, 'server', link.server),
     };
   }
 
@@ -435,23 +578,39 @@ class OpenApiTransformerBase {
     if (typeof mediaType !== 'object'
       || mediaType === null
       || isArray(mediaType)) {
+      this.warn('Ignoring non-object Media Type', mediaType);
       return mediaType;
     }
 
     const newMediaType = { ...mediaType };
 
     if (mediaType.schema !== undefined) {
-      newMediaType.schema = this.transformSchema(mediaType.schema);
+      newMediaType.schema = visit(
+        this,
+        this.transformSchema,
+        'schema',
+        mediaType.schema,
+      );
     }
 
     if (mediaType.examples !== undefined) {
-      newMediaType.examples =
-        this.transformMap(mediaType.examples, this.transformExample3);
+      newMediaType.examples = visit(
+        this,
+        this.transformMap,
+        'examples',
+        mediaType.examples,
+        this.transformExample3,
+      );
     }
 
     if (mediaType.encoding !== undefined) {
-      newMediaType.encoding =
-        this.transformMap(mediaType.encoding, this.transformEncoding);
+      newMediaType.encoding = visit(
+        this,
+        this.transformMap,
+        'encoding',
+        mediaType.encoding,
+        this.transformEncoding,
+      );
     }
 
     return newMediaType;
@@ -468,32 +627,58 @@ class OpenApiTransformerBase {
     if (typeof response !== 'object'
       || response === null
       || isArray(response)) {
+      this.warn('Ignoring non-object Response', response);
       return response;
     }
 
     const newResponse = { ...response };
 
     if (response.headers !== undefined) {
-      newResponse.headers =
-        this.transformMap(response.headers, this.transformHeader);
+      newResponse.headers = visit(
+        this,
+        this.transformMap,
+        'headers',
+        response.headers,
+        this.transformHeader,
+      );
     }
 
     if (response.content !== undefined) {
-      newResponse.content =
-        this.transformMap(response.content, this.transformMediaType);
+      newResponse.content = visit(
+        this,
+        this.transformMap,
+        'content',
+        response.content,
+        this.transformMediaType,
+      );
     }
 
     if (response.links !== undefined) {
-      newResponse.links =
-        this.transformMap(response.links, this.transformLink);
+      newResponse.links = visit(
+        this,
+        this.transformMap,
+        'links',
+        response.links,
+        this.transformLink,
+      );
     }
 
     if (response.schema !== undefined) {
-      newResponse.schema = this.transformSchema(response.schema);
+      newResponse.schema = visit(
+        this,
+        this.transformSchema,
+        'schema',
+        response.schema,
+      );
     }
 
     if (response.examples !== undefined) {
-      newResponse.examples = this.transformExample(response.examples);
+      newResponse.examples = visit(
+        this,
+        this.transformExample,
+        'examples',
+        response.examples,
+      );
     }
 
     return newResponse;
@@ -513,27 +698,48 @@ class OpenApiTransformerBase {
     if (typeof parameter !== 'object'
       || parameter === null
       || isArray(parameter)) {
+      this.warn('Ignoring non-object Parameter', parameter);
       return parameter;
     }
 
     const newParameter = { ...parameter };
 
     if (parameter.content !== undefined) {
-      newParameter.content =
-        this.transformMap(parameter.content, this.transformMediaType);
+      newParameter.content = visit(
+        this,
+        this.transformMap,
+        'content',
+        parameter.content,
+        this.transformMediaType,
+      );
     }
 
     if (parameter.schema !== undefined) {
-      newParameter.schema = this.transformSchema(parameter.schema);
+      newParameter.schema = visit(
+        this,
+        this.transformSchema,
+        'schema',
+        parameter.schema,
+      );
     }
 
     if (parameter.items !== undefined) {
-      newParameter.items = this.transformItems(parameter.items);
+      newParameter.items = visit(
+        this,
+        this.transformItems,
+        'items',
+        parameter.items,
+      );
     }
 
     if (parameter.examples !== undefined) {
-      newParameter.examples =
-        this.transformMap(parameter.examples, this.transformExample3);
+      newParameter.examples = visit(
+        this,
+        this.transformMap,
+        'examples',
+        parameter.examples,
+        this.transformExample3,
+      );
     }
 
     return newParameter;
@@ -548,6 +754,7 @@ class OpenApiTransformerBase {
    */
   transformResponses(responses) {
     if (!responses || typeof responses !== 'object' || isArray(responses)) {
+      this.warn('Ignoring non-object Responses', responses);
       return responses;
     }
 
@@ -565,8 +772,15 @@ class OpenApiTransformerBase {
       if (prop === 'default' || /^[1-5][0-9Xx][0-9Xx]$/.test(prop)) {
         const response = responses[prop];
         if (response !== undefined) {
-          newResponses[prop] = this.transformResponse(response);
+          newResponses[prop] = visit(
+            this,
+            this.transformResponse,
+            prop,
+            response,
+          );
         }
+      } else if (prop !== '$ref' &amp;&amp; !prop.startsWith('x-')) {
+        this.warn('Ignoring unrecognized property of Responses', prop);
       }
     }
 
@@ -581,7 +795,13 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Callback Object.
    */
   transformCallback(callback) {
-    return transformMapLike.call(this, callback, this.transformPathItem, true);
+    return transformMapLike.call(
+      this,
+      callback,
+      this.transformPathItem,
+      'Callback',
+      true,
+    );
   }
 
   /** Transforms a {@link
@@ -594,14 +814,24 @@ class OpenApiTransformerBase {
   transformRequestBody(requestBody) {
     if (typeof requestBody !== 'object'
       || requestBody === null
-      || isArray(requestBody)
-      || requestBody.content === undefined) {
+      || isArray(requestBody)) {
+      this.warn('Ignoring non-object Request Body', requestBody);
+      return requestBody;
+    }
+
+    if (requestBody.content === undefined) {
       return requestBody;
     }
 
     return {
       ...requestBody,
-      content: this.transformMap(requestBody.content, this.transformMediaType),
+      content: visit(
+        this,
+        this.transformMap,
+        'content',
+        requestBody.content,
+        this.transformMediaType,
+      ),
     };
   }
 
@@ -616,42 +846,64 @@ class OpenApiTransformerBase {
     if (typeof operation !== 'object'
       || operation === null
       || isArray(operation)) {
+      this.warn('Ignoring non-object Operation', operation);
       return operation;
     }
 
     const newOperation = { ...operation };
 
     if (operation.externalDocs !== undefined) {
-      newOperation.externalDocs =
-        this.transformExternalDocs(operation.externalDocs);
+      newOperation.externalDocs = visit(
+        this,
+        this.transformExternalDocs,
+        'externalDocs',
+        operation.externalDocs,
+      );
     }
 
-    if (isArray(operation.parameters)) {
+    if (operation.parameters !== undefined) {
       newOperation.parameters =
-        operation.parameters.map(this.transformParameter, this);
+        this.transformArray(operation.parameters, this.transformParameter);
     }
 
     if (operation.requestBody !== undefined) {
-      newOperation.requestBody =
-        this.transformRequestBody(operation.requestBody);
+      newOperation.requestBody = visit(
+        this,
+        this.transformRequestBody,
+        'requestBody',
+        operation.requestBody,
+      );
     }
 
     if (operation.responses !== undefined) {
-      newOperation.responses = this.transformResponses(operation.responses);
+      newOperation.responses = visit(
+        this,
+        this.transformResponses,
+        'responses',
+        operation.responses,
+      );
     }
 
     if (operation.callbacks !== undefined) {
-      newOperation.callbacks =
-        this.transformMap(operation.callbacks, this.transformCallback);
+      newOperation.callbacks = visit(
+        this,
+        this.transformMap,
+        'callbacks',
+        operation.callbacks,
+        this.transformCallback,
+      );
     }
 
-    if (isArray(operation.security)) {
-      newOperation.security =
-        operation.security.map(this.transformSecurityRequirement, this);
+    if (operation.security !== undefined) {
+      newOperation.security = this.transformArray(
+        operation.security,
+        this.transformSecurityRequirement,
+      );
     }
 
-    if (isArray(operation.servers)) {
-      newOperation.servers = operation.servers.map(this.transformServer, this);
+    if (operation.servers !== undefined) {
+      newOperation.servers =
+        this.transformArray(operation.servers, this.transformServer);
     }
 
     return newOperation;
@@ -668,24 +920,37 @@ class OpenApiTransformerBase {
     if (typeof pathItem !== 'object'
       || pathItem === null
       || isArray(pathItem)) {
+      this.warn('Ignoring non-object Path Item', pathItem);
       return pathItem;
     }
 
     const newPathItem = { ...pathItem };
 
-    if (isArray(pathItem.servers)) {
-      newPathItem.servers = pathItem.servers.map(this.transformServer, this);
+    if (pathItem.servers !== undefined) {
+      newPathItem.servers =
+        this.transformArray(pathItem.servers, this.transformServer);
     }
 
-    if (isArray(pathItem.parameters)) {
+    if (pathItem.parameters !== undefined) {
       newPathItem.parameters =
-        pathItem.parameters.map(this.transformParameter, this);
+        this.transformArray(pathItem.parameters, this.transformParameter);
     }
 
-    for (const method of Object.keys(pathItem)) {
-      const operation = pathItem[method];
-      if (operation !== undefined &amp;&amp; httpMethodSet.has(method.toUpperCase())) {
-        newPathItem[method] = this.transformOperation(operation);
+    for (const [method, operation] of Object.entries(pathItem)) {
+      if (operation !== undefined &amp;&amp; httpMethodSet.has(method.toLowerCase())) {
+        newPathItem[method] = visit(
+          this,
+          this.transformOperation,
+          method,
+          operation,
+        );
+      } else if (method !== '$ref'
+        &amp;&amp; method !== 'description'
+        &amp;&amp; method !== 'parameters'
+        &amp;&amp; method !== 'servers'
+        &amp;&amp; method !== 'summary'
+        &amp;&amp; !method.startsWith('x-')) {
+        this.warn('Ignoring unrecognized property of Path Item', method);
       }
     }
 
@@ -703,7 +968,13 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Paths Object.
    */
   transformPaths(paths) {
-    return transformMapLike.call(this, paths, this.transformPathItem, true);
+    return transformMapLike.call(
+      this,
+      paths,
+      this.transformPathItem,
+      'Paths',
+      true,
+    );
   }
 
   /** Transforms a {@link
@@ -717,61 +988,110 @@ class OpenApiTransformerBase {
     if (typeof components !== 'object'
       || components === null
       || isArray(components)) {
+      this.warn('Ignoring non-object Components', components);
       return components;
     }
 
     const newComponents = { ...components };
 
     if (components.schemas !== undefined) {
-      newComponents.schemas =
-        this.transformMap(components.schemas, this.transformSchema);
+      newComponents.schemas = visit(
+        this,
+        this.transformMap,
+        'schemas',
+        components.schemas,
+        this.transformSchema,
+      );
     }
 
     if (components.responses !== undefined) {
-      newComponents.responses =
-        this.transformMap(components.responses, this.transformResponse);
+      newComponents.responses = visit(
+        this,
+        this.transformMap,
+        'responses',
+        components.responses,
+        this.transformResponse,
+      );
     }
 
     if (components.parameters !== undefined) {
-      newComponents.parameters =
-        this.transformMap(components.parameters, this.transformParameter);
+      newComponents.parameters = visit(
+        this,
+        this.transformMap,
+        'parameters',
+        components.parameters,
+        this.transformParameter,
+      );
     }
 
     if (components.examples !== undefined) {
-      newComponents.examples =
-        this.transformMap(components.examples, this.transformExample3);
+      newComponents.examples = visit(
+        this,
+        this.transformMap,
+        'examples',
+        components.examples,
+        this.transformExample3,
+      );
     }
 
     if (components.requestBodies !== undefined) {
-      newComponents.requestBodies =
-        this.transformMap(components.requestBodies, this.transformRequestBody);
+      newComponents.requestBodies = visit(
+        this,
+        this.transformMap,
+        'requestBodies',
+        components.requestBodies,
+        this.transformRequestBody,
+      );
     }
 
     if (components.headers !== undefined) {
-      newComponents.headers =
-        this.transformMap(components.headers, this.transformHeader);
+      newComponents.headers = visit(
+        this,
+        this.transformMap,
+        'headers',
+        components.headers,
+        this.transformHeader,
+      );
     }
 
     if (components.securitySchemes !== undefined) {
-      newComponents.securitySchemes = this.transformMap(
+      newComponents.securitySchemes = visit(
+        this,
+        this.transformMap,
+        'securitySchemes',
         components.securitySchemes,
         this.transformSecurityScheme,
       );
     }
 
     if (components.links !== undefined) {
-      newComponents.links =
-        this.transformMap(components.links, this.transformLink);
+      newComponents.links = visit(
+        this,
+        this.transformMap,
+        'links',
+        components.links,
+        this.transformLink,
+      );
     }
 
     if (components.callbacks !== undefined) {
-      newComponents.callbacks =
-        this.transformMap(components.callbacks, this.transformCallback);
+      newComponents.callbacks = visit(
+        this,
+        this.transformMap,
+        'callbacks',
+        components.callbacks,
+        this.transformCallback,
+      );
     }
 
     if (components.pathItems !== undefined) {
-      newComponents.pathItems =
-        this.transformMap(components.pathItems, this.transformPathItem);
+      newComponents.pathItems = visit(
+        this,
+        this.transformMap,
+        'pathItems',
+        components.pathItems,
+        this.transformPathItem,
+      );
     }
 
     return newComponents;
@@ -797,17 +1117,24 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Server Object.
    */
   transformServer(server) {
-    if (typeof server !== 'object'
-      || server === null
-      || isArray(server)
-      || server.variables === undefined) {
+    if (typeof server !== 'object' || server === null || isArray(server)) {
+      this.warn('Ignoring non-object Server', server);
+      return server;
+    }
+
+    if (server.variables === undefined) {
       return server;
     }
 
     return {
       ...server,
-      variables:
-        this.transformMap(server.variables, this.transformServerVariable),
+      variables: visit(
+        this,
+        this.transformMap,
+        'variables',
+        server.variables,
+        this.transformServerVariable,
+      ),
     };
   }
 
@@ -832,27 +1159,46 @@ class OpenApiTransformerBase {
    */
   transformOAuthFlows(flows) {
     if (typeof flows !== 'object' || flows === null || isArray(flows)) {
+      this.warn('Ignoring non-object OAuth Flows', flows);
       return flows;
     }
 
     const newFlows = { ...flows };
 
     if (flows.implicit) {
-      newFlows.implicit = this.transformOAuthFlow(flows.implicit);
+      newFlows.implicit = visit(
+        this,
+        this.transformOAuthFlow,
+        'implicit',
+        flows.implicit,
+      );
     }
 
     if (flows.password) {
-      newFlows.password = this.transformOAuthFlow(flows.password);
+      newFlows.password = visit(
+        this,
+        this.transformOAuthFlow,
+        'password',
+        flows.password,
+      );
     }
 
     if (flows.clientCredentials) {
-      newFlows.clientCredentials =
-        this.transformOAuthFlow(flows.clientCredentials);
+      newFlows.clientCredentials = visit(
+        this,
+        this.transformOAuthFlow,
+        'clientCredentials',
+        flows.clientCredentials,
+      );
     }
 
     if (flows.authorizationCode) {
-      newFlows.authorizationCode =
-        this.transformOAuthFlow(flows.authorizationCode);
+      newFlows.authorizationCode = visit(
+        this,
+        this.transformOAuthFlow,
+        'authorizationCode',
+        flows.authorizationCode,
+      );
     }
 
     return newFlows;
@@ -868,14 +1214,23 @@ class OpenApiTransformerBase {
   transformSecurityScheme(securityScheme) {
     if (typeof securityScheme !== 'object'
       || securityScheme === null
-      || isArray(securityScheme)
-      || securityScheme.flows === undefined) {
+      || isArray(securityScheme)) {
+      this.warn('Ignoring non-object Security Scheme', securityScheme);
+      return securityScheme;
+    }
+
+    if (securityScheme.flows === undefined) {
       return securityScheme;
     }
 
     return {
       ...securityScheme,
-      flows: this.transformOAuthFlows(securityScheme.flows),
+      flows: visit(
+        this,
+        this.transformOAuthFlows,
+        'flows',
+        securityScheme.flows,
+      ),
     };
   }
 
@@ -899,16 +1254,23 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Tag Object.
    */
   transformTag(tag) {
-    if (typeof tag !== 'object'
-      || tag === null
-      || isArray(tag)
-      || tag.externalDocs === undefined) {
+    if (typeof tag !== 'object' || tag === null || isArray(tag)) {
+      this.warn('Ignoring non-object Tag', tag);
+      return tag;
+    }
+
+    if (tag.externalDocs === undefined) {
       return tag;
     }
 
     return {
       ...tag,
-      externalDocs: this.transformExternalDocs(tag.externalDocs),
+      externalDocs: visit(
+        this,
+        this.transformExternalDocs,
+        'externalDocs',
+        tag.externalDocs,
+      ),
     };
   }
 
@@ -945,17 +1307,28 @@ class OpenApiTransformerBase {
    */
   transformInfo(info) {
     if (typeof info !== 'object' || info === null || isArray(info)) {
+      this.warn('Ignoring non-object Info', info);
       return info;
     }
 
     const newInfo = { ...info };
 
     if (info.contact !== undefined) {
-      newInfo.contact = this.transformContact(info.contact);
+      newInfo.contact = visit(
+        this,
+        this.transformContact,
+        'contact',
+        info.contact,
+      );
     }
 
     if (info.license !== undefined) {
-      newInfo.license = this.transformLicense(info.license);
+      newInfo.license = visit(
+        this,
+        this.transformLicense,
+        'license',
+        info.license,
+      );
     }
 
     return info;
@@ -972,6 +1345,7 @@ class OpenApiTransformerBase {
    */
   transformOpenApi(openApi) {
     if (typeof openApi !== 'object' || openApi === null || isArray(openApi)) {
+      this.warn('Ignoring non-object OpenAPI', openApi);
       return openApi;
     }
 
@@ -980,11 +1354,12 @@ class OpenApiTransformerBase {
     };
 
     if (openApi.info !== undefined) {
-      newOpenApi.info = this.transformInfo(openApi.info);
+      newOpenApi.info = visit(this, this.transformInfo, 'info', openApi.info);
     }
 
-    if (isArray(openApi.servers)) {
-      newOpenApi.servers = openApi.servers.map(this.transformServer, this);
+    if (openApi.servers !== undefined) {
+      newOpenApi.servers =
+        this.transformArray(openApi.servers, this.transformServer);
     }
 
     // https://github.com/Azure/autorest/blob/master/docs/extensions/readme.md#x-ms-parameterized-host
@@ -992,10 +1367,10 @@ class OpenApiTransformerBase {
     if (typeof xMsParameterizedHost === 'object'
       &amp;&amp; xMsParameterizedHost !== null) {
       const { parameters } = xMsParameterizedHost;
-      if (isArray(parameters)) {
+      if (parameters !== undefined) {
         newOpenApi['x-ms-parameterized-host'] = {
           ...xMsParameterizedHost,
-          parameters: parameters.map(this.transformParameter, this),
+          parameters: this.transformArray(parameters, this.transformParameter),
         };
       }
     }
@@ -1004,53 +1379,112 @@ class OpenApiTransformerBase {
     // to have $refs pointing to them (to simplify renaming).
     // TODO: Guarantee this as part of the API?  Document in JSDoc comment.
     if (openApi.components !== undefined) {
-      newOpenApi.components = this.transformComponents(openApi.components);
+      newOpenApi.components = visit(
+        this,
+        this.transformComponents,
+        'components',
+        openApi.components,
+      );
     }
 
     if (openApi.definitions !== undefined) {
-      newOpenApi.definitions =
-        this.transformMap(openApi.definitions, this.transformSchema);
+      newOpenApi.definitions = visit(
+        this,
+        this.transformMap,
+        'definitions',
+        openApi.definitions,
+        this.transformSchema,
+      );
     }
 
     if (openApi.parameters !== undefined) {
-      newOpenApi.parameters =
-        this.transformMap(openApi.parameters, this.transformParameter);
+      newOpenApi.parameters = visit(
+        this,
+        this.transformMap,
+        'parameters',
+        openApi.parameters,
+        this.transformParameter,
+      );
     }
 
     if (openApi.responses !== undefined) {
-      newOpenApi.responses =
-        this.transformMap(openApi.responses, this.transformResponse);
+      newOpenApi.responses = visit(
+        this,
+        this.transformMap,
+        'responses',
+        openApi.responses,
+        this.transformResponse,
+      );
     }
 
     if (openApi.paths !== undefined) {
-      newOpenApi.paths = this.transformPaths(openApi.paths);
+      newOpenApi.paths = visit(
+        this,
+        this.transformPaths,
+        'paths',
+        openApi.paths,
+      );
     }
 
     // https://github.com/Azure/autorest/tree/master/docs/extensions#x-ms-paths
     if (openApi['x-ms-paths'] !== undefined) {
-      newOpenApi['x-ms-paths'] = this.transformPaths(openApi['x-ms-paths']);
+      newOpenApi['x-ms-paths'] = visit(
+        this,
+        this.transformPaths,
+        'x-ms-paths',
+        openApi['x-ms-paths'],
+      );
     }
 
     if (openApi.webhooks !== undefined) {
-      newOpenApi.webhooks =
-        this.transformMap(openApi.webhooks, this.transformPathItem);
+      newOpenApi.webhooks = visit(
+        this,
+        this.transformMap,
+        'webhooks',
+        openApi.webhooks,
+        this.transformPathItem,
+      );
     }
 
-    if (isArray(openApi.security)) {
-      newOpenApi.security =
-        openApi.security.map(this.transformSecurityRequirement, this);
+    if (openApi.security !== undefined) {
+      newOpenApi.security = this.transformArray(
+        openApi.security,
+        this.transformSecurityRequirement,
+      );
     }
 
-    if (isArray(openApi.tags)) {
-      newOpenApi.tags = openApi.tags.map(this.transformTag, this);
+    if (openApi.tags !== undefined) {
+      newOpenApi.tags = this.transformArray(openApi.tags, this.transformTag);
     }
 
     if (openApi.externalDocs !== undefined) {
-      newOpenApi.externalDocs =
-        this.transformExternalDocs(openApi.externalDocs);
+      newOpenApi.externalDocs = visit(
+        this,
+        this.transformExternalDocs,
+        'externalDocs',
+        openApi.externalDocs,
+      );
     }
 
     return newOpenApi;
+  }
+
+  /** Logs a warning about the transformation.
+   *
+   * Logs to util.debuglog('openapi-transformer-base') by default.  Designed
+   * to be overridden and/or reassigned to log as appropriate for projects
+   * which use this class.
+   *
+   * @param {string|*} message Message with zero or more substitution strings,
+   * or first value to log.
+   * @param {*} values Additional values to log.  Applied to substitution
+   * string in message, if one matches, otherwise appended.
+   */
+  warn(message, ...values) {
+    // Note: debug.enabled defined on Node.js v14.9.0 and later
+    if (debug.enabled !== false) {
+      debug(message, ...values, 'at', toJsonPointer(this.transformPath));
+    }
   }
 }
 
@@ -1065,13 +1499,13 @@ module.exports = OpenApiTransformerBase;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-openapi-transformer-base.html">openapi-transformer-base</a></li></ul><h3>Classes</h3><ul><li><a href="module-openapi-transformer-base-OpenApiTransformerBase.html">OpenApiTransformerBase</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_openapi-transformer-base_visit.js_.html">"openapi-transformer-base/visit.js"</a></li><li><a href="module-openapi-transformer-base.html">openapi-transformer-base</a></li></ul><h3>Classes</h3><ul><li><a href="module-openapi-transformer-base-OpenApiTransformerBase.html">OpenApiTransformerBase</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Sat May 29 2021 17:24:18 GMT-0600 (Mountain Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Mon Oct 04 2021 11:15:55 GMT-0600 (Mountain Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
