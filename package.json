@@ -1,6 +1,6 @@
 {
   "name": "openapi-transformer-base",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Base class for traversing or transforming OpenAPI 2 or 3 documents using a modified visitor design pattern to traverse object types within the OpenAPI document tree.",
   "keywords": [
     "openapi",
