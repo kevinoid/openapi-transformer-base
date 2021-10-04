@@ -136,6 +136,7 @@ class OpenApiTransformerBase {
       return arr;
     }
 
+    // eslint-disable-next-line unicorn/no-array-method-this-argument
     return arr.map(transform, this);
   }
 
