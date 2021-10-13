@@ -407,7 +407,7 @@ describe('OpenApiTransformerBase', () => {
   });
 
   describe('#transformMap()', () => {
-    methodPreservesArgumentType('transformServer');
+    methodPreservesArgumentType('transformMap');
 
     it('calls its second argument on each property', () => {
       const mapper = sinon.stub().returns(true);
