@@ -83,6 +83,93 @@ function methodPreservesArgumentType(methodName) {
 }
 
 describe('OpenApiTransformerBase', () => {
+  describe('#transformArray()', () => {
+    methodPreservesArgumentType('transformArray');
+
+    it('calls its second argument on each property', () => {
+      const mapper = sinon.stub().returns(true);
+      const arr = deepFreeze([null, false, 0, '']);
+      const t = sinon.spy(new OpenApiTransformerBase());
+      assert.deepStrictEqual(
+        t.transformArray(arr, mapper),
+        [true, true, true, true],
+      );
+      sinon.assert.calledWith(mapper, null);
+      sinon.assert.calledWith(mapper, false);
+      sinon.assert.calledWith(mapper, 0);
+      sinon.assert.calledWith(mapper, '');
+      sinon.assert.callCount(mapper, 4);
+      sinon.assert.alwaysCalledOn(mapper, t);
+      sinon.assert.calledOnce(t.transformArray);
+      assertOnlyCalledMethods(t, [t.transformArray]);
+    });
+
+    // These are not representable in JSON, so assumed to be unexpected
+    it('does not call its second argument on non-numeric properties', () => {
+      const mapper = sinon.stub().returns(true);
+      const arr = [1, 2];
+      arr['x-prop'] = {};
+      deepFreeze(arr);
+      const t = sinon.spy(new OpenApiTransformerBase());
+      assert.deepStrictEqual(t.transformArray(arr, mapper), [true, true]);
+      sinon.assert.calledWith(mapper, 1);
+      sinon.assert.calledWith(mapper, 2);
+      sinon.assert.calledTwice(mapper);
+      sinon.assert.alwaysCalledOn(mapper, t);
+      sinon.assert.calledOnce(t.transformArray);
+      assertOnlyCalledMethods(t, [t.transformArray]);
+    });
+
+    // For consistency with undefined values of non-Array object properties.
+    it('does not call its second argument on undefined values', () => {
+      const mapper = sinon.stub().returns(true);
+      const arr = deepFreeze([1, undefined, 2]);
+      const t = sinon.spy(new OpenApiTransformerBase());
+      assert.deepStrictEqual(
+        t.transformArray(arr, mapper),
+        [true, undefined, true],
+      );
+      sinon.assert.calledWith(mapper, 1);
+      sinon.assert.calledWith(mapper, 2);
+      sinon.assert.calledTwice(mapper);
+      sinon.assert.alwaysCalledOn(mapper, t);
+      sinon.assert.calledOnce(t.transformArray);
+      assertOnlyCalledMethods(t, [t.transformArray]);
+    });
+
+    // For consistency with undefined values of non-Array object properties.
+    it('does not call its second argument on sparse values', () => {
+      const mapper = sinon.stub().returns(true);
+      // eslint-disable-next-line no-sparse-arrays
+      const arr = deepFreeze([1, , 2]);
+      const t = sinon.spy(new OpenApiTransformerBase());
+      assert.deepStrictEqual(
+        t.transformArray(arr, mapper),
+        // eslint-disable-next-line no-sparse-arrays
+        [true, , true],
+      );
+      sinon.assert.calledWith(mapper, 1);
+      sinon.assert.calledWith(mapper, 2);
+      sinon.assert.calledTwice(mapper);
+      sinon.assert.alwaysCalledOn(mapper, t);
+      sinon.assert.calledOnce(t.transformArray);
+      assertOnlyCalledMethods(t, [t.transformArray]);
+    });
+
+    // Values defined by OAS as Array should not have Array-like values.
+    // Better to warn and leave as-is than to assume it is what we expect.
+    it('does not transforn Array-like values', () => {
+      const mapper = sinon.stub().returns(true);
+      const arr = deepFreeze({ 0: 1, 1: 2, length: 2 });
+      const t = sinon.spy(new OpenApiTransformerBase());
+      assert.deepStrictEqual(t.transformArray(arr, mapper), arr);
+      sinon.assert.notCalled(mapper);
+      sinon.assert.calledOnce(t.transformArray);
+      sinon.assert.calledOnce(t.warn);
+      assertOnlyCalledMethods(t, [t.transformArray, t.warn]);
+    });
+  });
+
   describe('#transformCallback()', () => {
     methodPreservesArgumentType('transformCallback');
 
