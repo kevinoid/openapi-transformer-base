@@ -136,8 +136,11 @@ class OpenApiTransformerBase {
       return arr;
     }
 
-    // eslint-disable-next-line unicorn/no-array-method-this-argument
-    return arr.map(transform, this);
+    return arr.map(
+      (value) => (value !== undefined
+        ? transform.call(this, value)
+        : undefined),
+    );
   }
 
   /** Transforms a <code>Map[string, ValueType]</code> using a given transform
