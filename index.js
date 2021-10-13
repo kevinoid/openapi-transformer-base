@@ -137,8 +137,8 @@ class OpenApiTransformerBase {
     }
 
     return arr.map(
-      (value) => (value !== undefined
-        ? transform.call(this, value)
+      (value, i) => (value !== undefined
+        ? visit(this, transform, `${i}`, value)
         : undefined),
     );
   }
