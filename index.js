@@ -239,10 +239,10 @@ class OpenApiTransformerBase {
    */
   transformSchema(schema) {
     if (typeof schema !== 'object' || schema === null || isArray(schema)) {
-      // Note: JSON Schema Core draft-handrews-json-schema-02 (referenced by
-      // current/ OpenAPI 3.1 drafts) defines true and false as valid schemas
+      // Note: JSON Schema 2020-12 (i.e. draft-bhutton-json-schema-00),
+      // referenced by OpenAPI 3.1, defines true and false as valid schemas
       // with true equivalent to {} and false equivalent to {not:{}}
-      // https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.3.2
+      // https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.3.2
       if (typeof schema !== 'boolean') {
         this.warn('Ignoring non-object Schema', schema);
       }
