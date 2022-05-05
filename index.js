@@ -23,7 +23,7 @@ const debug = debuglog('openapi-transformer-base');
  */
 const httpMethodSet = new Set(METHODS.map((method) => method.toLowerCase()));
 
-/** Transforms a value which has type object<string,ValueType> but is not
+/** Transforms a value which has type Object<string,ValueType> but is not
  * defined as Map[string,ValueType] in OpenAPI.
  *
  * Note: This is currently used for schema properties, where #transformMap()
@@ -33,7 +33,7 @@ const httpMethodSet = new Set(METHODS.map((method) => method.toLowerCase()));
  * @private
  * @template ValueType, TransformedType
  * @this {!OpenApiTransformerBase}
- * @param {!object<string,ValueType>|*} obj Map-like object to transform.
+ * @param {!Object<string,ValueType>|*} obj Map-like object to transform.
  * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
  * } transform Method which transforms values in obj.
  * @param {string} logName Name of object being transformed (for logging).
@@ -41,7 +41,7 @@ const httpMethodSet = new Set(METHODS.map((method) => method.toLowerCase()));
  * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#specificationExtensions
  * Specification Extensions} (i.e.  properties starting with "x-").
  * Such properties are copied to the returned object without transformation.
- * @returns {!object<string,TransformedType>|*} If obj is a Map, a plain object
+ * @returns {!Object<string,TransformedType>|*} If obj is a Map, a plain object
  * with the same own enumerable string-keyed properties as obj with values
  * returned by transform.  Otherwise, obj is returned unchanged.
  */
@@ -158,10 +158,10 @@ class OpenApiTransformerBase {
    * </ul>
    *
    * @template ValueType, TransformedType
-   * @param {!object<string,ValueType>|*} obj Map to transform.
+   * @param {!Object<string,ValueType>|*} obj Map to transform.
    * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
    * } transform Method which transforms values in obj.
-   * @returns {!object<string,TransformedType>|*} If obj is a Map, a plain
+   * @returns {!Object<string,TransformedType>|*} If obj is a Map, a plain
    * object with the same own enumerable string-keyed properties as obj with
    * values returned by transform.  Otherwise, obj is returned unchanged.
    */
