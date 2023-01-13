@@ -8,9 +8,9 @@ OpenApiTransformerBase
 [![Version on NPM](https://img.shields.io/npm/v/openapi-transformer-base.svg?style=flat)](https://www.npmjs.com/package/openapi-transformer-base)
 
 Base class for traversing or transforming [OpenAPI
-2](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
+2](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/2.0.md)
 or [OpenAPI
-3](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md)
+3](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md)
 documents using a modified [visitor design
 pattern](https://en.wikipedia.org/wiki/Visitor_pattern) to traverse object
 types within the OpenAPI document tree.
@@ -25,7 +25,7 @@ transformations in
 ### Gather External Documentation
 
 To gather all [External
-Documentation](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#externalDocumentationObject)
+Documentation](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#externalDocumentationObject)
 objects in an OpenAPI 3 document using an ad-hoc (i.e. monkey-patched)
 subclass:
 
@@ -56,7 +56,7 @@ readFile('openapi.json', 'utf8')
 ### Change Integer to Number Schema Type
 
 Since [`type: integer` is an OpenAPI-specific
-extension](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#data-types)
+extension](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#data-types)
 of [`type` in JSON
 Schema](https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.1.1),
 it may be desirable to change schemas with `type: integer` to `type: number`
