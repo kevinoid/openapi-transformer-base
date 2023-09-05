@@ -11,6 +11,8 @@ const deepFreeze = require('deep-freeze');
 const sinon = require('sinon');
 const { inspect } = require('util');
 
+// https://github.com/import-js/eslint-plugin-import/issues/2844
+// eslint-disable-next-line import/extensions
 const OpenApiTransformerBase = require('..');
 
 /* Specification Extension Property Ambiguity:
