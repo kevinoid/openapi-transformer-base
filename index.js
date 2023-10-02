@@ -82,7 +82,7 @@ function transformMapLike(obj, transform, logName, skipExtensions) {
  *   copies rather than modifying the argument objects.</li>
  * <li>JSON References, if present, are passed to the transform method for
  *   the type required by their position.  (e.g. a schema $ref is passed to
- *   {@link transformSchema}).</li>
+ *   {@link #transformSchema}).</li>
  * <li>Properties which are not defined in the OpenAPI specification are
  *   preserved in returned objects unchanged. (e.g. <code>x-</code> extension
  *   properties)</li>
@@ -92,8 +92,8 @@ function transformMapLike(obj, transform, logName, skipExtensions) {
  *   version in the document.  It will traverse properties which are present,
  *   regardless of whether they are specified in the declared version.</li>
  * <li>Callers may begin traversal at any point in the document (e.g. by
- *   calling {@link transformSchema} directly, instead of transitively through
- *   {@link transformOpenApi}).</li>
+ *   calling {@link #transformSchema}
+ *   directly, instead of transitively through {@link #transformOpenApi}).</li>
  * <li>No validation is performed on the OpenAPI document and every attempt is
  *   made to handle invalid values gracefully.  Child classes should be
  *   prepared for arguments with any type or value if the document may not be
