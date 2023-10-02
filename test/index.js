@@ -6,10 +6,11 @@
 
 'use strict';
 
-const assert = require('assert');
+const assert = require('node:assert');
+const { inspect } = require('node:util');
+
 const deepFreeze = require('deep-freeze');
 const sinon = require('sinon');
-const { inspect } = require('util');
 
 // https://github.com/import-js/eslint-plugin-import/issues/2844
 // eslint-disable-next-line import/extensions

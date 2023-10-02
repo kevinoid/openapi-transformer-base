@@ -6,7 +6,7 @@
 
 'use strict';
 
-const assert = require('assert');
+const assert = require('node:assert');
 
 const toJsonPointer = require('./lib/to-json-pointer.js');
 

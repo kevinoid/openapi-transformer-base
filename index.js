@@ -6,8 +6,8 @@
 
 'use strict';
 
-const { METHODS } = require('http');
-const { debuglog } = require('util');
+const { METHODS } = require('node:http');
+const { debuglog } = require('node:util');
 
 const toJsonPointer = require('./lib/to-json-pointer.js');
 const visit = require('./visit.js');
