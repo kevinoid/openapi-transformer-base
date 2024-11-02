@@ -109,7 +109,7 @@ describe('visit', () => {
       assert.fail();
     } catch (err) {
       assert.strictEqual(err, errTest);
-      assert(!hasOwnProperty.call(err, 'transformPath'));
+      assert(!Object.hasOwn(err, 'transformPath'));
       assert.deepStrictEqual(transformPath, []);
     }
   });

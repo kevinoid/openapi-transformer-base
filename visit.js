@@ -31,7 +31,7 @@ function visit(transformer, method, propName, ...args) {
     return method.apply(transformer, args);
   } catch (err) {
     handlingException = true;
-    if (err instanceof Error && !hasOwnProperty.call(err, 'transformPath')) {
+    if (err instanceof Error && !Object.hasOwn(err, 'transformPath')) {
       err.transformPath = [...transformer.transformPath];
       err.message +=
         ` (while transforming ${toJsonPointer(err.transformPath)})`;
