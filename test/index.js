@@ -32,7 +32,8 @@ function assertOnlyCalledMethods(obj, onlyMethods) {
   const onlyMethodsSet = new Set(onlyMethods);
   const unseenMethodsSet = new Set(onlyMethodsSet);
   // Note: sinon stubs methods using a non-enumerable value descriptor
-  for (const desc of Object.values(Object.getOwnPropertyDescriptors(obj))) {
+  const ownPropertyDescriptors = Object.getOwnPropertyDescriptors(obj);
+  for (const desc of Object.values(ownPropertyDescriptors)) {
     const method = desc.value;
     // Identify stubs using logic like sinon verifyIsStub
     // https://github.com/sinonjs/sinon/blob/v10.0.1/lib/sinon/assert.js#L21
