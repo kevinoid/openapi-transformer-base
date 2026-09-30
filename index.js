@@ -734,7 +734,7 @@ class OpenApiTransformerBase {
     }
 
     const newResponses = { ...responses };
-    for (const prop of Object.keys(responses)) {
+    for (const [prop, response] of Object.entries(responses)) {
       // Only "default", HTTP response codes, and HTTP response code patterns
       // are defined to contain Response Object.  Other properties may be
       // extensions or defined as something else in future OpenAPI versions.
@@ -745,7 +745,6 @@ class OpenApiTransformerBase {
       // Although lowercase and single x are not valid, the risk of being
       // anything other than a response object is low enough to justify.
       if (prop === 'default' || /^[1-5][0-9Xx][0-9Xx]$/.test(prop)) {
-        const response = responses[prop];
         if (response !== undefined) {
           newResponses[prop] = visit(
             this,
