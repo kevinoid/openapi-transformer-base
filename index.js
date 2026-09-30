@@ -1454,6 +1454,7 @@ class OpenApiTransformerBase {
   warn(message, ...values) {
     // Note: debug.enabled defined on Node.js v14.9.0 and later
     if (debug.enabled !== false) {
+      // eslint-disable-next-line unicorn/no-undeclared-class-members
       debug(message, ...values, 'at', toJsonPointer(this.transformPath));
     }
   }
