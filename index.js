@@ -23,53 +23,6 @@ const debug = debuglog('openapi-transformer-base');
  */
 const httpMethodSet = new Set(METHODS.map((method) => method.toLowerCase()));
 
-/** Transforms a value which has type Object<string,ValueType> but is not
- * defined as Map[string,ValueType] in OpenAPI.
- *
- * Note: This is currently used for schema properties, where #transformMap()
- * often complicates transformations due to differences with Map[string,Schema]
- * on definitions/components.schema and complicates optimizations.
- *
- * @private
- * @template ValueType, TransformedType
- * @this {!OpenApiTransformerBase}
- * @param {!Object<string,ValueType>|*} obj Map-like object to transform.
- * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
- * } transform Method which transforms values in obj.
- * @param {string} logName Name of object being transformed (for logging).
- * @param {boolean=} skipExtensions If true, do not call transform on {@link
- * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#specificationExtensions
- * Specification Extensions} (i.e.  properties starting with "x-").
- * Such properties are copied to the returned object without transformation.
- * @returns {!Object<string,TransformedType>|*} If obj is a Map, a plain object
- * with the same own enumerable string-keyed properties as obj with values
- * returned by transform.  Otherwise, obj is returned unchanged.
- */
-function transformMapLike(obj, transform, logName, skipExtensions) {
-  if (typeof obj !== 'object' || obj === null) {
-    this.warn(`Ignoring non-object ${logName}`, obj);
-    return obj;
-  }
-
-  if (isArray(obj)) {
-    // Note: This function is only called for values specified as Map[X,Y]
-    // in the OpenAPI Specification.  Array values are invalid and it would
-    // be unsafe to assume that their contents are type Y.  Return unchanged.
-    this.warn(`Ignoring non-object ${logName}`, obj);
-    return obj;
-  }
-
-  const newObj = { ...obj };
-  for (const [propName, propValue] of Object.entries(obj)) {
-    if (propValue !== undefined
-      && (!skipExtensions || !propName.startsWith('x-'))) {
-      newObj[propName] = visit(this, transform, propName, propValue);
-    }
-  }
-
-  return newObj;
-}
-
 /** Base class for traversing or transforming OpenAPI 2.x or 3.x documents
  * using a modified visitor design pattern to traverse object types within
  * the OpenAPI document tree.
@@ -120,6 +73,53 @@ class OpenApiTransformerBase {
     Object.defineProperty(this, 'transformPath', { value: [] });
   }
 
+  /** Transforms a value which has type Object<string,ValueType> but is not
+   * defined as Map[string,ValueType] in OpenAPI.
+   *
+   * Note: This is currently used for schema properties, where #transformMap()
+   * often complicates transformations due to differences with
+   * Map[string,Schema] on definitions/components.schema and complicates
+   * optimizations.
+   *
+   * @template ValueType, TransformedType
+   * @this {!OpenApiTransformerBase}
+   * @param {!Object<string,ValueType>|*} obj Map-like object to transform.
+   * @param {function(this:!OpenApiTransformerBase, ValueType): TransformedType
+   * } transform Method which transforms values in obj.
+   * @param {string} logName Name of object being transformed (for logging).
+   * @param {boolean=} skipExtensions If true, do not call transform on {@link
+   * https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#specificationExtensions
+   * Specification Extensions} (i.e.  properties starting with "x-").
+   * Such properties are copied to the returned object without transformation.
+   * @returns {!Object<string,TransformedType>|*} If obj is a Map, a plain
+   * object with the same own enumerable string-keyed properties as obj with
+   * values returned by transform.  Otherwise, obj is returned unchanged.
+   */
+  #transformMapLike(obj, transform, logName, skipExtensions) {
+    if (typeof obj !== 'object' || obj === null) {
+      this.warn(`Ignoring non-object ${logName}`, obj);
+      return obj;
+    }
+
+    if (isArray(obj)) {
+      // Note: This function is only called for values specified as Map[X,Y]
+      // in the OpenAPI Specification.  Array values are invalid and it would
+      // be unsafe to assume that their contents are type Y.  Return unchanged.
+      this.warn(`Ignoring non-object ${logName}`, obj);
+      return obj;
+    }
+
+    const newObj = { ...obj };
+    for (const [propName, propValue] of Object.entries(obj)) {
+      if (propValue !== undefined
+        && (!skipExtensions || !propName.startsWith('x-'))) {
+        newObj[propName] = visit(this, transform, propName, propValue);
+      }
+    }
+
+    return newObj;
+  }
+
   /** Transforms an <code>Array[ValueType]</code> using a given transform
    * method.
    *
@@ -166,7 +166,7 @@ class OpenApiTransformerBase {
    * values returned by transform.  Otherwise, obj is returned unchanged.
    */
   transformMap(obj, transform) {
-    return transformMapLike.call(this, obj, transform, 'Map');
+    return this.#transformMapLike(obj, transform, 'Map');
   }
 
   /** Transforms a {@link
@@ -323,7 +323,7 @@ class OpenApiTransformerBase {
     if (patternProperties !== undefined) {
       newSchema.patternProperties = visit(
         this,
-        transformMapLike,
+        this.#transformMapLike,
         'patternProperties',
         patternProperties,
         this.transformSchema,
@@ -374,7 +374,7 @@ class OpenApiTransformerBase {
     if (dependentSchemas !== undefined) {
       newSchema.dependentSchemas = visit(
         this,
-        transformMapLike,
+        this.#transformMapLike,
         'dependentSchemas',
         dependentSchemas,
         this.transformSchema,
@@ -419,8 +419,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Schema Object properties.
    */
   transformSchemaProperties(properties) {
-    return transformMapLike.call(
-      this,
+    return this.#transformMapLike(
       properties,
       this.transformSchema,
       'Schema properties',
@@ -769,8 +768,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Callback Object.
    */
   transformCallback(callback) {
-    return transformMapLike.call(
-      this,
+    return this.#transformMapLike(
       callback,
       this.transformPathItem,
       'Callback',
@@ -942,8 +940,7 @@ class OpenApiTransformerBase {
    * @returns {!object} Transformed Paths Object.
    */
   transformPaths(paths) {
-    return transformMapLike.call(
-      this,
+    return this.#transformMapLike(
       paths,
       this.transformPathItem,
       'Paths',
