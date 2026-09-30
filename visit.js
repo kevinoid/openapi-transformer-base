@@ -26,11 +26,11 @@ module.exports =
 function visit(transformer, method, propName, ...args) {
   transformer.transformPath.push(propName);
 
-  let handlingException = false;
+  let haveException = false;
   try {
     return method.apply(transformer, args);
   } catch (err) {
-    handlingException = true;
+    haveException = true;
     if (err instanceof Error && !Object.hasOwn(err, 'transformPath')) {
       err.transformPath = [...transformer.transformPath];
       err.message +=
@@ -42,7 +42,7 @@ function visit(transformer, method, propName, ...args) {
     const popProp = transformer.transformPath.pop();
 
     // Avoid clobbering an exception which is already propagating
-    if (!handlingException) {
+    if (!haveException) {
       assert.strictEqual(popProp, propName);
     }
   }

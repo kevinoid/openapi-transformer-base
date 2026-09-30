@@ -47,14 +47,14 @@ describe('visit', () => {
     const { transformPath } = transformer;
     assert.deepStrictEqual(transformPath, []);
     const propName = 'propName';
-    let called = false;
+    let wasCalled = false;
     function method() {
-      assert(!called);
-      called = true;
+      assert(!wasCalled);
+      wasCalled = true;
       assert.deepStrictEqual(transformPath, [propName]);
     }
     visit(transformer, method, propName);
-    assert(called);
+    assert(wasCalled);
     assert.deepStrictEqual(transformPath, []);
   });
 
