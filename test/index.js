@@ -180,7 +180,7 @@ describe('OpenApiTransformerBase', () => {
     it('calls transformPathItem on each value', () => {
       const t = sinon.spy(new OpenApiTransformerBase());
       const callback = deepFreeze({
-        'http://example.com': {},
+        'https://example.com': {},
         '$request.body#/url': {},
       });
       assert.deepStrictEqual(t.transformCallback(callback), callback);
